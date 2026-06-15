@@ -1,0 +1,466 @@
+{% extends 'base_dashboard.html' %}
+
+{% block title %}Detail Modul - EIO Master{% endblock %}
+
+{% block extra_style %}
+<style>
+    /* Navigasi Kembali */
+    .back-link { 
+        display: flex; 
+        align-items: center; 
+        gap: 10px; 
+        font-weight: 800; 
+        color: #1e293b; 
+        text-decoration: none; 
+        margin-bottom: 25px; 
+        font-size: 1.2rem; 
+    }
+    
+    .back-btn { 
+        background: var(--white); 
+        border: 1px solid #e2e8f0; 
+        width: 36px; 
+        height: 36px; 
+        border-radius: 10px; 
+        display: flex; 
+        align-items: center; 
+        justify-content: center; 
+        color: var(--text-main); 
+        font-size: 0.9rem;
+    }
+    
+    /* Banner Detail Dokumen */
+    .detail-banner { 
+        background: var(--primary); 
+        border-radius: 20px; 
+        padding: 40px; 
+        color: white; 
+        margin-bottom: 25px; 
+        box-shadow: 0 10px 30px rgba(99, 60, 245, 0.15); 
+    }
+    
+    .detail-banner h2 { 
+        font-weight: 800; 
+        font-size: 1.8rem; 
+        margin: 0 0 15px 0; 
+    }
+    
+    .badge-container { 
+        display: flex; 
+        gap: 15px; 
+    }
+    
+    .badge-pill { 
+        background: rgba(255, 255, 255, 0.2); 
+        backdrop-filter: blur(5px); 
+        padding: 8px 16px; 
+        border-radius: 50px; 
+        font-size: 0.85rem; 
+        font-weight: 700; 
+        display: flex; 
+        align-items: center; 
+        gap: 8px; 
+    }
+
+    /* Alert Sukses Custom */
+    .alert-success-custom { 
+        background: #ecfdf5; 
+        border: 1px solid #a7f3d0; 
+        border-radius: 12px; 
+        padding: 16px 20px; 
+        display: flex; 
+        align-items: center; 
+        gap: 15px; 
+        color: #065f46; 
+        font-weight: 600; 
+        font-size: 0.95rem; 
+        margin-bottom: 25px; 
+    }
+    
+    .alert-icon { 
+        background: #10b981; 
+        color: white; 
+        width: 24px; 
+        height: 24px; 
+        border-radius: 50%; 
+        display: flex; 
+        align-items: center; 
+        justify-content: center; 
+        font-size: 0.8rem; 
+        flex-shrink: 0; 
+    }
+
+    /* Layout Konten Utama */
+    .content-grid { 
+        display: grid; 
+        grid-template-columns: 1fr 380px; 
+        gap: 25px; 
+        align-items: stretch; 
+        padding-bottom: 50px; 
+    }
+
+    /* Styling Teks & Tabel AI (Markdown Output) */
+    .modal-body {
+        padding: 40px;
+        color: #2c3e50;
+        line-height: 1.6;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background-color: #fff;
+    }
+
+    .modal-body table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 25px 0;
+        font-size: 0.95rem;
+        border: 1px solid #d1d5db; 
+    }
+
+    .modal-body th {
+        background-color: #f3f4f6; 
+        color: #111827;
+        font-weight: 600;
+        text-align: left;
+        padding: 12px;
+        border: 1px solid #d1d5db; 
+    }
+
+    .modal-body td {
+        padding: 10px 12px;
+        border: 1px solid #d1d5db; 
+        vertical-align: top;
+    }
+
+    .modal-body ul, 
+    .modal-body ol {
+        margin-bottom: 20px;
+        padding-left: 25px;
+    }
+
+    .modal-body li {
+        margin-bottom: 8px;
+    }
+
+    .modal-body p {
+        margin-bottom: 1.5rem;
+    }
+
+    /* Kartu Ringkasan */
+    .summary-card { 
+        background: var(--white); 
+        border-radius: 16px; 
+        padding: 30px; 
+        box-shadow: 0 4px 15px rgba(0,0,0,0.02); 
+        border: 1px solid #e2e8f0; 
+        border-left: 6px solid var(--primary); 
+        display: flex; 
+        flex-direction: column; 
+    }
+    
+    .summary-title { 
+        font-size: 1.1rem; 
+        font-weight: 800; 
+        color: var(--primary); 
+        margin: 0 0 15px 0; 
+    }
+
+    /* Override Modal Body (Menyesuaikan Cascade CSS Sebelumnya) */
+    .modal-body { 
+        padding: 30px; 
+        overflow-y: auto; 
+        color: #334155; 
+        line-height: 1.6; 
+        font-size: 1rem; 
+        text-align: left; 
+        white-space: pre-wrap; 
+        font-family: 'Inter', sans-serif; 
+    }
+
+    /* Penanganan Font Monospace untuk Format Tabel Khusus */
+    .modal-body:contains("|") {
+        font-family: 'Courier New', Courier, monospace; 
+    }
+
+    .summary-text { 
+        color: #334155; 
+        line-height: 1.6; 
+        font-size: 0.95rem; 
+        text-align: justify;
+        white-space: pre-wrap;
+        display: -webkit-box;
+        display: box;
+        line-clamp: 10;
+        -webkit-line-clamp: 10;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+    
+    .btn-read-more { 
+        background: #f8fafc; 
+        color: var(--primary); 
+        border: none; 
+        padding: 10px 20px; 
+        border-radius: 10px; 
+        font-weight: 800; 
+        font-size: 0.85rem; 
+        cursor: pointer; 
+        transition: 0.2s; 
+        display: inline-flex; 
+        align-items: center; 
+        gap: 8px; 
+        align-self: flex-start; 
+    }
+    
+    .btn-read-more:hover { 
+        background: #f1f5f9; 
+    }
+
+    /* Kartu Quiz / Latihan */
+    .quiz-card { 
+        background: var(--white); 
+        border-radius: 16px; 
+        padding: 30px; 
+        box-shadow: 0 4px 15px rgba(0,0,0,0.02); 
+        border: 1px solid #e2e8f0; 
+        display: flex; 
+        flex-direction: column; 
+    }
+    
+    .quiz-title { 
+        font-size: 1.2rem; 
+        font-weight: 800; 
+        color: var(--text-main); 
+        margin: 0 0 10px 0; 
+    }
+    
+    .quiz-desc { 
+        color: #64748b; 
+        font-size: 0.85rem; 
+        font-weight: 500; 
+        line-height: 1.5; 
+        margin-bottom: 25px; 
+    }
+    
+    .custom-label { 
+        font-size: 0.85rem; 
+        font-weight: 800; 
+        color: #1e293b; 
+        margin-bottom: 8px; 
+        display: block; 
+    }
+    
+    .custom-input { 
+        width: 100%; 
+        background: #f8fafc; 
+        border: 1px solid #e2e8f0; 
+        border-radius: 12px; 
+        padding: 12px 15px; 
+        font-size: 0.9rem; 
+        color: #475569; 
+        font-weight: 600; 
+        margin-bottom: 20px; 
+        outline: none; 
+        transition: 0.2s; 
+    }
+    
+    .btn-generate { 
+        width: 100%; 
+        background: #10b981; 
+        color: white; 
+        border: none; 
+        border-radius: 12px; 
+        padding: 14px; 
+        font-weight: 800; 
+        font-size: 0.95rem; 
+        cursor: pointer; 
+        transition: 0.2s; 
+        box-shadow: 0 8px 20px rgba(16, 185, 129, 0.25); 
+        display: flex; 
+        justify-content: center; 
+        align-items: center; 
+        gap: 8px; 
+        margin-top: auto; 
+    }
+    
+    .btn-generate:hover { 
+        transform: translateY(-2px); 
+        box-shadow: 0 12px 25px rgba(16, 185, 129, 0.35); 
+    }
+
+    /* Modal Styling */
+    .modal-overlay { 
+        position: fixed; 
+        top: 0; 
+        left: 0; 
+        width: 100%; 
+        height: 100%; 
+        background: rgba(15, 23, 42, 0.6); 
+        backdrop-filter: blur(4px); 
+        z-index: 9999; 
+        display: none; 
+        align-items: center; 
+        justify-content: center; 
+        padding: 20px; 
+    }
+    
+    .modal-overlay.show { 
+        display: flex; 
+        animation: fadeIn 0.3s forwards; 
+    }
+    
+    @keyframes fadeIn { 
+        from { opacity: 0; } 
+        to { opacity: 1; } 
+    }
+    
+    .modal-content { 
+        background: var(--white); 
+        border-radius: 20px; 
+        width: 100%; 
+        max-width: 800px; 
+        max-height: 85vh; 
+        display: flex; 
+        flex-direction: column; 
+        box-shadow: 0 25px 50px rgba(0,0,0,0.25); 
+        overflow: hidden; 
+    }
+    
+    .modal-header { 
+        padding: 25px 30px; 
+        border-bottom: 1px solid #e2e8f0; 
+        display: flex; 
+        justify-content: space-between; 
+        align-items: center; 
+    }
+    
+    .modal-header h3 { 
+        margin: 0; 
+        color: var(--text-main); 
+        font-weight: 800; 
+        font-size: 1.4rem; 
+        display: flex; 
+        align-items: center; 
+        gap: 10px; 
+    }
+    
+    .btn-close-modal { 
+        background: #f1f5f9; 
+        border: none; 
+        width: 36px; 
+        height: 36px; 
+        border-radius: 10px; 
+        color: #64748b; 
+        cursor: pointer; 
+        transition: 0.2s; 
+    }
+    
+    /* Override Final untuk Modal Body */
+    .modal-body { 
+        padding: 30px; 
+        overflow-y: auto; 
+        color: #334155; 
+        line-height: 1.8; 
+        font-size: 1rem; 
+        text-align: justify; 
+        white-space: pre-line; 
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<a href="{% url 'documents:upload' %}" class="back-link">
+    <div class="back-btn"><i class="fa-solid fa-chevron-left"></i></div> Detail Pembelajaran
+</a>
+
+<div class="detail-banner">
+    <h2>{{ dokumen.file_dokumen.name|cut:"materi_dokumen/" }}</h2>
+    
+    <div class="badge-container">
+        <div class="badge-pill">
+            <i class="fa-regular fa-calendar"></i> Diunggah pada {{ dokumen.tanggal_unggah|date:"d M Y" }}
+        </div>
+        
+        {% if dokumen.is_processed_ai %}
+        <div class="badge-pill">
+            <i class="fa-solid fa-file-signature"></i> {{ dokumen.judul_modul }}
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+{% if dokumen.is_processed_ai %}
+<div class="alert-success-custom">
+    <div class="alert-icon"><i class="fa-solid fa-check"></i></div>
+    Dokumen ini telah siap! AI telah memproses struktur dan inti dari modul pembelajaran.
+</div>
+{% endif %}
+
+<div class="content-grid">
+    <!-- Kartu Rangkuman -->
+    <div class="summary-card">
+        <h4 class="summary-title">Rangkuman Cerdas AI</h4>
+        <p class="summary-text">
+            {{ dokumen.rangkuman_ai|striptags|truncatewords:350 }}
+        </p>
+        <button class="btn-read-more" onclick="openSummaryModal()">
+            Baca Selengkapnya <i class="fa-solid fa-expand"></i>
+        </button>
+    </div>
+
+    <!-- Kartu Generator Latihan/Quiz -->
+    <div class="quiz-card">
+        <h3 class="quiz-title">Uji Pemahamanmu! 🎯</h3>
+        <p class="quiz-desc">Pilih format latihan yang sesuai dengan gaya belajarmu berdasarkan materi yang telah diolah.</p>
+        
+        <form action="{% url 'latihan:generate' %}" method="POST">
+            {% csrf_token %}
+            <input type="hidden" name="document_id" value="{{ dokumen.pk }}">
+            
+            <label class="custom-label">Jumlah Soal</label>
+            <input type="number" name="jumlah_soal" class="custom-input" value="5" min="1" max="20">
+    
+            <label class="custom-label">Format Latihan</label>
+            <select name="format_latihan" class="custom-input" style="appearance: auto;">
+                <option value="pilihan_ganda">Pilihan Ganda )</option>
+                <option value="flashcard">Flashcard Pintar</option>
+                <option value="essay">Essay / Uraian</option>
+            </select>
+    
+            <button type="submit" class="btn-generate">
+                <i class="fa-solid fa-bolt"></i> Generate Kuis Sekarang
+            </button>
+        </form>
+    </div>
+</div>
+
+<!-- Modal Rangkuman Lengkap -->
+<div class="modal-overlay" id="summaryModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3><i class="fa-solid fa-wand-magic-sparkles"></i> Rangkuman Modul Lengkap</h3>
+            <button class="btn-close-modal" onclick="closeSummaryModal()"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div class="modal-body">
+            {{ dokumen.rangkuman_ai|safe }}
+        </div>
+    </div>
+</div>
+
+<script>
+    function openSummaryModal() {
+        document.getElementById('summaryModal').classList.add('show');
+    }
+
+    function closeSummaryModal() {
+        document.getElementById('summaryModal').classList.remove('show');
+    }
+
+    // Menutup modal jika area di luar box diklik
+    window.onclick = function(event) {
+        let modal = document.getElementById('summaryModal');
+        if (event.target === modal) {
+            closeSummaryModal();
+        }
+    }
+</script>
+{% endblock %}

@@ -1,0 +1,860 @@
+{% extends 'base_dashboard.html' %}
+
+{% block title %}Kuis Pilihan Ganda - {{ dokumen.nama_file }}{% endblock %}
+
+{% block extra_style %}
+<style>
+    /* ========================================= */
+    /* LAYOUT & HEADER KUIS                      */
+    /* ========================================= */
+    .latihan-header { 
+        display: flex; 
+        justify-content: space-between; 
+        align-items: center; 
+        margin-bottom: 25px; 
+    }
+    
+    .btn-close-latihan { 
+        background: var(--white); 
+        border: 1px solid #e2e8f0; 
+        width: 40px; 
+        height: 40px; 
+        border-radius: 12px; 
+        display: flex; 
+        align-items: center; 
+        justify-content: center; 
+        color: var(--text-main); 
+        font-size: 1.1rem; 
+        cursor: pointer; 
+        transition: 0.2s; 
+        box-shadow: 0 2px 10px rgba(0,0,0,0.02); 
+    }
+    
+    .btn-close-latihan:hover { 
+        background: #fef2f2; 
+        color: #ef4444; 
+        border-color: #fecaca; 
+    }
+    
+    .latihan-title { 
+        font-size: 1.3rem; 
+        font-weight: 800; 
+        color: var(--text-main); 
+        margin: 0; 
+    }
+    
+    .chat-bot {
+        display: none !important;
+    }
+    
+    .timer-badge { 
+        background: #fef2f2; 
+        color: #ef4444; 
+        font-weight: 800; 
+        font-size: 0.95rem; 
+        padding: 10px 20px; 
+        border-radius: 50px; 
+        border: 1px solid #fecaca; 
+        display: flex; 
+        align-items: center; 
+        gap: 8px; 
+    }
+
+    /* ========================================= */
+    /* PROGRESS BAR                              */
+    /* ========================================= */
+    .progress-info { 
+        display: flex; 
+        justify-content: space-between; 
+        align-items: center; 
+        font-size: 0.9rem; 
+        font-weight: 700; 
+        color: #64748b; 
+        margin-bottom: 10px; 
+    }
+    
+    .progress-percentage { 
+        color: var(--primary); 
+    }
+    
+    .progress-bar-bg { 
+        width: 100%; 
+        height: 8px; 
+        background: #e2e8f0; 
+        border-radius: 10px; 
+        overflow: hidden; 
+        margin-bottom: 30px; 
+    }
+    
+    .progress-bar-fill { 
+        height: 100%; 
+        background: var(--primary); 
+        border-radius: 10px; 
+        width: 0%; 
+        transition: width 0.4s ease; 
+    }
+
+    /* ========================================= */
+    /* QUESTION CARD                             */
+    /* ========================================= */
+    .question-card { 
+        background: var(--white); 
+        border-radius: 20px; 
+        padding: 35px 40px; 
+        box-shadow: 0 10px 30px rgba(0,0,0,0.02); 
+        border: 1px solid #f1f5f9; 
+        margin-bottom: 25px; 
+        position: relative; 
+    }
+    
+    .badge-question { 
+        background: var(--primary); 
+        color: white; 
+        font-size: 0.75rem; 
+        font-weight: 800; 
+        padding: 6px 16px; 
+        border-radius: 8px; 
+        text-transform: uppercase; 
+        letter-spacing: 1px; 
+        position: absolute; 
+        top: -14px; 
+        left: 40px; 
+        box-shadow: 0 4px 10px rgba(99, 60, 245, 0.2); 
+    }
+    
+    .question-text { 
+        font-size: 1.25rem; 
+        font-weight: 800; 
+        color: var(--text-main); 
+        line-height: 1.6; 
+        margin: 0; 
+    }
+
+    /* ========================================= */
+    /* MULTIPLE CHOICE OPTIONS                   */
+    /* ========================================= */
+    .options-container { 
+        display: flex; 
+        flex-direction: column; 
+        gap: 15px; 
+        margin-bottom: 40px; 
+    }
+    
+    .option-item { 
+        background: var(--white); 
+        border: 2px solid #e2e8f0; 
+        border-radius: 16px; 
+        padding: 16px 20px; 
+        display: flex; 
+        align-items: center; 
+        justify-content: space-between; 
+        cursor: pointer; 
+        transition: 0.2s; 
+    }
+    
+    .option-item:hover { 
+        border-color: #cbd5e1; 
+        background: #f8fafc; 
+    }
+    
+    .option-content { 
+        display: flex; 
+        align-items: center; 
+        gap: 15px; 
+    }
+    
+    .option-letter { 
+        background: #f1f5f9; 
+        color: #64748b; 
+        font-weight: 800; 
+        width: 36px; 
+        height: 36px; 
+        border-radius: 10px; 
+        display: flex; 
+        align-items: center; 
+        justify-content: center; 
+        flex-shrink: 0; 
+        transition: 0.2s; 
+    }
+    
+    .option-text { 
+        font-size: 1rem; 
+        font-weight: 600; 
+        color: #334155; 
+    }
+    
+    .option-radio { 
+        width: 20px; 
+        height: 20px; 
+        border-radius: 50%; 
+        border: 2px solid #cbd5e1; 
+        display: flex; 
+        align-items: center; 
+        justify-content: center; 
+        transition: 0.2s; 
+    }
+    
+    .option-radio::after { 
+        content: ''; 
+        width: 10px; 
+        height: 10px; 
+        background: var(--primary); 
+        border-radius: 50%; 
+        transform: scale(0); 
+        transition: 0.2s; 
+    }
+
+    /* State Aktif (Opsi Terpilih) */
+    .option-item.selected { 
+        border-color: var(--primary); 
+        background: #f5f3ff; 
+    }
+    
+    .option-item.selected .option-letter { 
+        background: var(--primary); 
+        color: white; 
+    }
+    
+    .option-item.selected .option-text { 
+        color: var(--primary); 
+    }
+    
+    .option-item.selected .option-radio { 
+        border-color: var(--primary); 
+    }
+    
+    .option-item.selected .option-radio::after { 
+        transform: scale(1); 
+    }
+
+    /* ========================================= */
+    /* NAVIGATION BUTTONS                        */
+    /* ========================================= */
+    .nav-buttons { 
+        display: flex; 
+        justify-content: space-between; 
+        align-items: center; 
+    }
+    
+    .btn-nav { 
+        padding: 14px 24px; 
+        border-radius: 12px; 
+        font-weight: 800; 
+        font-size: 0.95rem; 
+        cursor: pointer; 
+        transition: 0.2s; 
+        display: flex; 
+        align-items: center; 
+        gap: 10px; 
+        border: none; 
+    }
+    
+    .btn-prev { 
+        background: #f8fafc; 
+        color: #64748b; 
+        border: 1px solid #e2e8f0; 
+    }
+    
+    .btn-prev:hover { 
+        background: #f1f5f9; 
+        color: var(--text-main); 
+    }
+    
+    .btn-prev:disabled { 
+        opacity: 0.5; 
+        cursor: not-allowed; 
+    }
+    
+    .btn-next { 
+        background: var(--primary); 
+        color: white; 
+        box-shadow: 0 4px 15px rgba(99, 60, 245, 0.25); 
+    }
+    
+    .btn-next:hover { 
+        transform: translateY(-2px); 
+        box-shadow: 0 8px 20px rgba(99, 60, 245, 0.35); 
+    }
+    
+    .btn-finish-quiz { 
+        background: #10b981; 
+        color: white; 
+        box-shadow: 0 4px 15px rgba(16, 185, 129, 0.25); 
+        display: none; 
+    }
+    
+    .btn-finish-quiz:hover { 
+        transform: translateY(-2px); 
+        box-shadow: 0 8px 20px rgba(16, 185, 129, 0.35); 
+    }
+
+    /* ========================================= */
+    /* TAMPILAN LAPORAN HASIL                    */
+    /* ========================================= */
+    #result-view { 
+        display: none; 
+        animation: fadeIn 0.4s ease; 
+    }
+    
+    @keyframes fadeIn { 
+        from { opacity: 0; transform: translateY(10px); } 
+        to { opacity: 1; transform: translateY(0); } 
+    }
+
+    .result-summary-card { 
+        background: var(--white); 
+        border-radius: 24px; 
+        padding: 40px; 
+        box-shadow: 0 10px 40px rgba(0,0,0,0.03); 
+        border: 1px solid #f1f5f9; 
+        margin-bottom: 30px; 
+        display: flex; 
+        align-items: center; 
+        gap: 40px; 
+    }
+    
+    .score-circle { 
+        width: 120px; 
+        height: 120px; 
+        border-radius: 50%; 
+        border: 6px solid #10b981; 
+        display: flex; 
+        align-items: center; 
+        justify-content: center; 
+        font-size: 3rem; 
+        font-weight: 800; 
+        color: #10b981; 
+        flex-shrink: 0; 
+        box-shadow: 0 10px 30px rgba(16, 185, 129, 0.15); 
+    }
+    
+    .score-circle.bad { 
+        border-color: #ef4444; 
+        color: #ef4444; 
+        box-shadow: 0 10px 30px rgba(239, 68, 68, 0.15); 
+    }
+    
+    .summary-text h2 { 
+        margin: 0 0 5px 0; 
+        font-size: 1.8rem; 
+        font-weight: 800; 
+        color: var(--text-main); 
+    }
+    
+    .summary-text p { 
+        margin: 0; 
+        color: #64748b; 
+        font-size: 0.95rem; 
+        font-weight: 500; 
+    }
+    
+    .summary-stats { 
+        display: flex; 
+        gap: 30px; 
+        margin-left: auto; 
+        text-align: center; 
+    }
+    
+    .stat-box h3 { 
+        margin: 0; 
+        font-size: 1.8rem; 
+        font-weight: 800; 
+        color: var(--text-main); 
+    }
+    
+    .stat-box h3.text-green { color: #10b981; }
+    .stat-box h3.text-red { color: #ef4444; }
+    
+    .stat-box p { 
+        margin: 0; 
+        font-size: 0.75rem; 
+        font-weight: 800; 
+        color: #94a3b8; 
+        text-transform: uppercase; 
+        letter-spacing: 1px; 
+    }
+
+    /* List Pembahasan Detail */
+    .review-header { 
+        display: flex; 
+        align-items: center; 
+        gap: 10px; 
+        font-size: 1.2rem; 
+        font-weight: 800; 
+        color: var(--text-main); 
+        margin-bottom: 20px; 
+    }
+    
+    .review-list { 
+        display: flex; 
+        flex-direction: column; 
+        gap: 20px; 
+        margin-bottom: 40px; 
+    }
+    
+    .review-item { 
+        background: var(--white); 
+        border: 1px solid #e2e8f0; 
+        border-radius: 16px; 
+        padding: 25px; 
+        box-shadow: 0 4px 15px rgba(0,0,0,0.02); 
+    }
+    
+    .review-item.wrong { 
+        border-color: #fecaca; 
+        background: #fff5f5; 
+    }
+    
+    .review-item-header { 
+        display: flex; 
+        justify-content: space-between; 
+        align-items: center; 
+        margin-bottom: 15px; 
+    }
+    
+    .badge-soal { 
+        background: #f1f5f9; 
+        color: #64748b; 
+        font-size: 0.75rem; 
+        font-weight: 800; 
+        padding: 6px 12px; 
+        border-radius: 8px; 
+    }
+    
+    .badge-status { 
+        font-size: 0.8rem; 
+        font-weight: 800; 
+        padding: 6px 12px; 
+        border-radius: 8px; 
+    }
+    
+    .badge-status.benar { background: #d1fae5; color: #10b981; }
+    .badge-status.salah { background: #fee2e2; color: #ef4444; }
+    
+    .review-question { 
+        font-size: 1.1rem; 
+        font-weight: 800; 
+        color: var(--text-main); 
+        margin: 0 0 15px 0; 
+        line-height: 1.5; 
+    }
+    
+    /* Box Jawaban Evaluasi */
+    .answer-box { 
+        background: #ecfdf5; 
+        border: 1px solid #a7f3d0; 
+        border-radius: 12px; 
+        padding: 15px 20px; 
+        display: flex; 
+        align-items: center; 
+        gap: 12px; 
+        color: #065f46; 
+        font-weight: 700; 
+        font-size: 0.95rem; 
+    }
+    
+    .answer-box.wrong { 
+        background: #fef2f2; 
+        border-color: #fecaca; 
+        color: #991b1b; 
+        margin-bottom: 10px; 
+    }
+    
+    .correct-correction { 
+        background: var(--white); 
+        border: 1px dashed #cbd5e1; 
+        border-radius: 12px; 
+        padding: 15px 20px; 
+        display: flex; 
+        flex-direction: column; 
+        gap: 5px; 
+    }
+    
+    .correct-correction label { 
+        font-size: 0.7rem; 
+        font-weight: 800; 
+        color: #f59e0b; 
+        text-transform: uppercase; 
+        display: flex; 
+        align-items: center; 
+        gap: 5px; 
+    }
+    
+    .correct-correction span { 
+        font-weight: 700; 
+        color: var(--text-main); 
+        font-size: 0.95rem; 
+    }
+
+    .btn-back-home { 
+        width: 100%; 
+        background: var(--white); 
+        color: var(--text-main); 
+        border: 1px solid #e2e8f0; 
+        border-radius: 16px; 
+        padding: 18px; 
+        font-weight: 800; 
+        font-size: 1.1rem; 
+        cursor: pointer; 
+        transition: 0.2s; 
+        box-shadow: 0 4px 15px rgba(0,0,0,0.02); 
+        text-align: center; 
+        text-decoration: none; 
+        display: flex; 
+        justify-content: center; 
+        align-items: center; 
+        gap: 10px; 
+    }
+    
+    .btn-back-home:hover { 
+        background: #f8fafc; 
+        transform: translateY(-2px); 
+        box-shadow: 0 8px 20px rgba(0,0,0,0.05); 
+        color: var(--text-main); 
+    }
+    
+    @keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.05); box-shadow: 0 0 15px rgba(239, 68, 68, 0.4); }
+        100% { transform: scale(1); }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- AREA KUIS UTAMA -->
+<div id="quiz-view">
+    <div class="latihan-header">
+        <div class="d-flex align-items-center gap-3">            
+            <button class="btn-close-latihan" onclick="window.location.href=`{% url 'users:dashboard' %}`">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <h3 class="latihan-title">Latihan: {{ dokumen.nama_file }}</h3>
+        </div>
+        <div class="timer-badge" id="timerBadge">
+            <i class="fa-regular fa-clock"></i> <span id="timerText">00:00</span>
+        </div>
+    </div>
+
+    <div class="progress-info">
+        <span id="progressText">Memuat Soal...</span>
+        <span class="progress-percentage" id="progressPercent">0%</span>
+    </div>
+    <div class="progress-bar-bg">
+        <div class="progress-bar-fill" id="progressBar"></div>
+    </div>
+
+    <div class="question-card">
+        <span class="badge-question" id="badgeQuestion">MEMUAT...</span>
+        <p class="question-text" id="questionText">Mohon tunggu, menyiapkan kuis...</p>
+    </div>
+
+    <div class="options-container" id="optionsContainer">
+        <!-- Opsi jawaban dirender melalui JavaScript -->
+    </div>
+
+    <div class="nav-buttons">
+        <button class="btn-nav btn-prev" id="btnPrev" onclick="navigate(-1)" disabled>
+            <i class="fa-solid fa-chevron-left"></i> Sebelumnya
+        </button>
+        <button class="btn-nav btn-next" id="btnNext" onclick="navigate(1)">
+            Selanjutnya <i class="fa-solid fa-chevron-right"></i>
+        </button>
+        <button class="btn-nav btn-finish-quiz" id="btnFinish" onclick="finishQuiz()">
+            Selesai Kuis <i class="fa-solid fa-flag-checkered"></i>
+        </button>
+    </div>
+</div>
+
+<!-- AREA HASIL EVALUASI -->
+<div id="result-view">
+    <div class="latihan-header">
+        <h3 class="latihan-title">Laporan Hasil Latihan</h3>
+        <button class="btn-close-latihan"><i class="fa-solid fa-share-nodes"></i></button>
+    </div>
+
+    <div class="result-summary-card">
+        <div class="score-circle" id="finalScoreCircle">0</div>
+        <div class="summary-text">
+            <h2 id="resultGreeting">Kerja Bagus, {{ request.user.first_name|default:"Kamal" }}! 🎉</h2>
+            <p id="resultMessage">Kamu telah menyelesaikan sesi latihan ini.</p>
+        </div>
+        <div class="summary-stats">
+            <div class="stat-box">
+                <h3 class="text-green" id="statBenar">0</h3>
+                <p>Benar</p>
+            </div>
+            <div class="stat-box">
+                <h3 class="text-red" id="statSalah">0</h3>
+                <p>Salah</p>
+            </div>
+            <div class="stat-box">
+                <h3 id="statWaktu">00:00</h3>
+                <p>Waktu</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="review-header">
+        <i class="fa-solid fa-list-check text-primary"></i> Detail Pembahasan
+    </div>
+    
+    <div class="review-list" id="reviewListContainer">
+        <!-- Review soal dirender melalui JavaScript -->
+    </div>
+
+    <a href="{% url 'users:dashboard' %}" class="btn-back-home">
+        <i class="fa-solid fa-house"></i> Kembali ke Dasbor Utama
+    </a>
+</div>
+
+<script>
+    // Inisialisasi Data dari Django
+    const rawData = JSON.parse('{{ data|escapejs }}' || '[]');
+    let questions = [];
+    
+    // Parsing Data JSON
+    if (rawData && rawData.length > 0) {
+        questions = rawData.map(item => {
+            const answerMap = {'A': 0, 'B': 1, 'C': 2, 'D': 3};
+            const correctIndex = answerMap[item.ans.toUpperCase()] || 0; 
+            
+            return {
+                q: item.q,
+                options: [item.a, item.b, item.c, item.d],
+                correctAnswerIndex: correctIndex
+            };
+        });
+    }
+
+    // Application State
+    let currentIndex = 0;
+    let totalQuestions = 0;
+    let userAnswers = []; 
+    
+    // Timer State
+    let totalSeconds = 0; 
+    let timerInterval;
+    let timeTakenSeconds = 0;
+
+    // DOM Elements Cache
+    const qText = document.getElementById('questionText');
+    const badgeQ = document.getElementById('badgeQuestion');
+    const optionsContainer = document.getElementById('optionsContainer');
+    const progressText = document.getElementById('progressText');
+    const progressPercent = document.getElementById('progressPercent');
+    const progressBar = document.getElementById('progressBar');
+    
+    const btnPrev = document.getElementById('btnPrev');
+    const btnNext = document.getElementById('btnNext');
+    const btnFinish = document.getElementById('btnFinish');
+    const timerText = document.getElementById('timerText');
+
+    // Setup Awal Kuis
+    function initQuiz() {
+        if(questions.length === 0) {
+            qText.textContent = "Gagal memuat soal. Silakan generate ulang dari dasbor.";
+            badgeQ.textContent = "ERROR";
+            return;
+        }
+
+        totalQuestions = questions.length;
+        userAnswers = new Array(totalQuestions).fill(null);
+        
+        // Alokasi Waktu: 1 Menit per soal
+        totalSeconds = totalQuestions * 60; 
+        
+        renderQuestion();
+        startTimer();
+    }
+
+    // Render Pertanyaan Saat Ini
+    function renderQuestion() {
+        const currentQ = questions[currentIndex];
+        
+        qText.textContent = currentQ.q;
+        badgeQ.textContent = `PERTANYAAN ${currentIndex + 1}`;
+        progressText.textContent = `Soal ${currentIndex + 1} dari ${totalQuestions}`;
+        
+        const percent = Math.round(((currentIndex + 1) / totalQuestions) * 100);
+        progressPercent.textContent = `${percent}%`;
+        progressBar.style.width = `${percent}%`;
+
+        optionsContainer.innerHTML = '';
+        const letters = ['A', 'B', 'C', 'D'];
+        
+        currentQ.options.forEach((opt, index) => {
+            const isSelected = userAnswers[currentIndex] === index;
+            const optionDiv = document.createElement('div');
+            
+            optionDiv.className = `option-item ${isSelected ? 'selected' : ''}`;
+            optionDiv.onclick = () => selectOption(index);
+            
+            optionDiv.innerHTML = `
+                <div class="option-content">
+                    <div class="option-letter">${letters[index]}</div>
+                    <div class="option-text">${opt}</div>
+                </div>
+                <div class="option-radio"></div>
+            `;
+            optionsContainer.appendChild(optionDiv);
+        });
+
+        // Kontrol Tombol Navigasi
+        btnPrev.disabled = currentIndex === 0;
+        
+        if (currentIndex === totalQuestions - 1) {
+            btnNext.style.display = 'none';
+            btnFinish.style.display = 'flex';
+        } else {
+            btnNext.style.display = 'flex';
+            btnFinish.style.display = 'none';
+        }
+    }
+
+    // Handle Pemilihan Jawaban
+    function selectOption(optIndex) {
+        userAnswers[currentIndex] = optIndex;
+        renderQuestion(); 
+    }
+
+    // Handle Transisi Soal
+    window.navigate = function(step) {
+        currentIndex += step;
+        renderQuestion();
+    };
+
+    // Eksekusi Timer UI
+    function startTimer() {
+        updateTimerUI();
+        
+        timerInterval = setInterval(() => {
+            totalSeconds--;
+            timeTakenSeconds++;
+            
+            updateTimerUI();
+
+            if (totalSeconds <= 0) {
+                clearInterval(timerInterval);
+                finishQuiz();
+            }
+        }, 1000);
+    }
+    
+    function updateTimerUI() {
+        const m = Math.floor(totalSeconds / 60).toString().padStart(2, '0');
+        const s = (totalSeconds % 60).toString().padStart(2, '0');
+        timerText.textContent = `${m}:${s}`;
+
+        if (totalSeconds > 0 && totalSeconds <= 60) {
+            document.getElementById('timerBadge').style.animation = 'pulse 1s infinite';
+        } else {
+            document.getElementById('timerBadge').style.animation = 'none';
+        }
+    }
+
+    // Utilitas Format Durasi (String)
+    function formatTimeTaken(seconds) {
+        const m = Math.floor(seconds / 60).toString().padStart(2, '0');
+        const s = (seconds % 60).toString().padStart(2, '0');
+        return `${m}:${s}`;
+    }
+
+    // Evaluasi Jawaban & Render Laporan
+    window.finishQuiz = function() {
+        clearInterval(timerInterval); 
+
+        let correctCount = 0;
+        let wrongCount = 0;
+
+        const reviewListContainer = document.getElementById('reviewListContainer');
+        reviewListContainer.innerHTML = '';
+
+        questions.forEach((q, index) => {
+            const userAnswer = userAnswers[index];
+            const isCorrect = userAnswer === q.correctAnswerIndex;
+            
+            if (isCorrect) correctCount++;
+            else wrongCount++;
+
+            const itemDiv = document.createElement('div');
+            itemDiv.className = `review-item ${isCorrect ? '' : 'wrong'}`;
+            
+            let statusBadge = isCorrect 
+                ? `<div class="badge-status benar">Benar</div>`
+                : `<div class="badge-status salah">Salah</div>`;
+
+            let answerContent = '';
+            if (isCorrect) {
+                answerContent = `
+                    <div class="answer-box">
+                        <i class="fa-solid fa-circle-check"></i> ${q.options[userAnswer]}
+                    </div>
+                `;
+            } else {
+                let userText = userAnswer !== null ? q.options[userAnswer] : "Tidak dijawab";
+                answerContent = `
+                    <div class="answer-box wrong">
+                        <i class="fa-solid fa-circle-xmark"></i> ${userText}
+                    </div>
+                    <div class="correct-correction">
+                        <label><i class="fa-regular fa-lightbulb"></i> JAWABAN BENAR:</label>
+                        <span>${q.options[q.correctAnswerIndex]}</span>
+                    </div>
+                `;
+            }
+
+            itemDiv.innerHTML = `
+                <div class="review-item-header">
+                    <span class="badge-soal">Soal ${index + 1}</span>
+                    ${statusBadge}
+                </div>
+                <h4 class="review-question">${q.q}</h4>
+                ${answerContent}
+            `;
+            reviewListContainer.appendChild(itemDiv);
+        });
+
+        // Kalkulasi Skor Akhir
+        const finalScore = Math.round((correctCount / totalQuestions) * 100);
+
+        const scoreCircle = document.getElementById('finalScoreCircle');
+        scoreCircle.textContent = finalScore;
+        
+        const greeting = document.getElementById('resultGreeting');
+        const message = document.getElementById('resultMessage');
+        
+        if (finalScore >= 80) {
+            greeting.textContent = `Kerja Bagus, {{ request.user.first_name|default:"Kamal" }}! 🎉`;
+            message.textContent = "Kamu menguasai sebagian besar materi pada sesi latihan ini.";
+            scoreCircle.classList.remove('bad');
+        } else if (finalScore >= 60) {
+            greeting.textContent = `Cukup Baik, {{ request.user.first_name|default:"Kamal" }}! 👍`;
+            message.textContent = "Pemahamanmu cukup, tapi masih bisa ditingkatkan lagi.";
+            scoreCircle.classList.remove('bad');
+        } else {
+            greeting.textContent = `Jangan Menyerah, {{ request.user.first_name|default:"Kamal" }}! 💪`;
+            message.textContent = "Ayo pelajari materinya lagi dan coba kuis ini di lain waktu.";
+            scoreCircle.classList.add('bad');
+        }
+        
+        document.getElementById('statBenar').textContent = correctCount;
+        document.getElementById('statSalah').textContent = wrongCount;
+        document.getElementById('statWaktu').textContent = formatTimeTaken(timeTakenSeconds);
+
+        // Render Antarmuka Review
+        document.getElementById('quiz-view').style.display = 'none';
+        document.getElementById('result-view').style.display = 'block';
+        window.scrollTo(0, 0); 
+    };
+
+    // Jalankan Skrip Kuis
+    try {
+        initQuiz();
+    } catch(e) {
+        console.error("Error loading quiz data:", e);
+        qText.textContent = "Terjadi kesalahan saat memproses data soal dari AI.";
+        badgeQ.textContent = "ERROR";
+    }
+</script>
+{% endblock %}

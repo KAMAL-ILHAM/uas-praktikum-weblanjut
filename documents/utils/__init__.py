@@ -1,0 +1,1 @@
+from .file_extractor import ekstrak_teks_dari_file

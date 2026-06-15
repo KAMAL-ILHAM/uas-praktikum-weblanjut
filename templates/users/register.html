@@ -1,0 +1,276 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - EIO Master</title>
+    
+    <!-- Bootstrap 5 & Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    
+    <style>
+        /* Base Layout */
+        body { 
+            margin: 0; 
+            padding: 0; 
+            background-color: white; 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            overflow-x: hidden; 
+        }
+        
+        .login-card { 
+            background: white; 
+            width: 100%; 
+            min-height: 100vh; 
+            border-radius: 0; 
+            box-shadow: none; 
+        }
+
+        /* Left Sidebar: Branding */
+        .bg-purple-gradient { 
+            background: linear-gradient(135deg, #7c5cff, #6441f1); 
+            color: white; 
+            padding: 4rem; 
+            display: flex; 
+            flex-direction: column; 
+            justify-content: center; 
+        }
+        
+        .logo-title { 
+            font-size: 2.2rem; 
+            font-weight: bold; 
+            display: flex; 
+            align-items: center; 
+            margin-bottom: 1rem; 
+        }
+        
+        .logo-title i { 
+            font-size: 2.5rem; 
+            margin-right: 15px; 
+        }
+        
+        .description-text { 
+            font-size: 1rem; 
+            line-height: 1.6; 
+            opacity: 0.9; 
+        }
+
+        /* Right Sidebar: Form Section */
+        .form-section { 
+            padding: 3rem 4rem; 
+            display: flex; 
+            flex-direction: column; 
+            justify-content: center; 
+        }
+        
+        /* Alert Messages */
+        .custom-alert { 
+            background-color: #fef2f2; 
+            border-left: 4px solid #ef4444; 
+            color: #b91c1c; 
+            padding: 12px 16px; 
+            border-radius: 6px; 
+            font-size: 0.85rem; 
+            display: flex; 
+            align-items: center; 
+            margin-bottom: 1.5rem; 
+        }
+        
+        .custom-alert i { 
+            margin-right: 10px; 
+            font-size: 1rem; 
+        }
+        
+        .custom-alert.success { 
+            background-color: #ecfdf5; 
+            border-left-color: #10b981; 
+            color: #065f46; 
+        }
+        
+        /* Form Inputs */
+        .form-label { 
+            font-size: 0.85rem; 
+            font-weight: 700; 
+            color: #374151; 
+            margin-bottom: 0.4rem; 
+        }
+        
+        .input-wrapper { 
+            position: relative; 
+            margin-bottom: 1.2rem; 
+        }
+        
+        .input-wrapper i.icon-left { 
+            position: absolute; 
+            left: 15px; 
+            top: 50%; 
+            transform: translateY(-50%); 
+            color: #9ca3af; 
+        }
+        
+        .input-wrapper i.icon-right { 
+            position: absolute; 
+            right: 15px; 
+            top: 50%; 
+            transform: translateY(-50%); 
+            color: #9ca3af; 
+            cursor: pointer; 
+        }
+        
+        .form-control-custom { 
+            width: 100%; 
+            padding: 12px 40px; 
+            border-radius: 8px; 
+            border: 1px solid #d1d5db; 
+            font-size: 0.9rem; 
+            color: #4b5563; 
+            outline: none; 
+            transition: border-color 0.2s; 
+        }
+        
+        .form-control-custom:focus { 
+            border-color: #7c5cff; 
+            box-shadow: 0 0 0 3px rgba(124, 92, 255, 0.1); 
+        }
+        
+        /* Typography & Buttons */
+        .btn-ungu { 
+            background: linear-gradient(135deg, #8160ff, #6441f1); 
+            color: white; 
+            border: none; 
+            border-radius: 8px; 
+            padding: 12px; 
+            font-weight: 600; 
+            width: 100%; 
+            box-shadow: 0 4px 15px rgba(100, 65, 241, 0.3); 
+            margin-top: 1rem; 
+            transition: transform 0.2s; 
+        }
+        
+        .btn-ungu:hover { 
+            transform: translateY(-2px); 
+            color: white; 
+        }
+        
+        .link-purple { 
+            color: #6441f1; 
+            font-weight: 700; 
+            text-decoration: none; 
+            font-size: 0.85rem; 
+        }
+        
+        .link-purple:hover { 
+            text-decoration: underline; 
+        }
+        
+        .text-small { 
+            font-size: 0.85rem; 
+            color: #6b7280; 
+        }
+        
+        .text-hint { 
+            font-size: 0.7rem; 
+            color: #9ca3af; 
+        }
+    </style>
+</head>
+<body>
+
+    <div class="row login-card mx-0">
+        <!-- Left Sidebar: Branding -->
+        <div class="col-md-5 bg-purple-gradient d-none d-md-flex">
+            <div class="logo-title">
+                <i class="bi bi-layers-fill"></i> EIO Master
+            </div>
+            <p class="description-text">
+                Mulai perjalanan belajarmu hari ini. Bergabunglah dengan ribuan siswa lainnya untuk pengalaman belajar yang lebih cerdas.
+            </p>
+        </div>
+
+        <!-- Right Sidebar: Registration Form -->
+        <div class="col-md-7 form-section">
+            <div class="w-100" style="max-width: 400px; margin: 0 auto;">
+                
+                <div class="text-center mb-4">
+                    <h3 class="fw-bold mb-1">Mulai Perjalananmu</h3>
+                    <p class="text-small">Buat akun untuk membuka semua fitur AI EIO.</p>
+                </div>
+
+                <!-- Django Alert Messages -->
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="custom-alert {% if 'success' in message.tags %}success{% endif %}">
+                            <i class="bi {% if 'success' in message.tags %}bi-check-circle-fill{% else %}bi-exclamation-circle-fill{% endif %}"></i> 
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+
+                <!-- Main Form -->
+                <form method="POST" action="{% url 'users:register' %}">
+                    {% csrf_token %}
+                    
+                    <label class="form-label">Username</label>
+                    <div class="input-wrapper">
+                        <i class="bi bi-person icon-left"></i>
+                        <input type="text" class="form-control-custom" name="username" placeholder="Masukkan username" required>
+                    </div>
+
+                    <div class="d-flex justify-content-between align-items-end mb-1">
+                        <label class="form-label mb-0">Email</label>
+                        <span class="text-hint">Tanpa Spasi, Huruf & angka</span>
+                    </div>
+                    <div class="input-wrapper">
+                        <i class="bi bi-envelope icon-left"></i>
+                        <input type="email" class="form-control-custom" name="email" placeholder="Masukkan email" required>
+                    </div>
+
+                    <label class="form-label">Password</label>
+                    <div class="input-wrapper">
+                        <i class="bi bi-lock icon-left"></i>
+                        <input type="password" id="regPassword" class="form-control-custom" name="password" placeholder="Masukkan password" required>
+                        <i class="bi bi-eye-slash icon-right" id="eyeReg" onclick="togglePass('regPassword', 'eyeReg')"></i>
+                    </div>
+
+                    <div class="d-flex justify-content-between align-items-end mb-1">
+                        <label class="form-label mb-0">Konfirmasi Password</label>
+                        <span class="text-hint">Min. 8 karakter</span>
+                    </div>
+                    <div class="input-wrapper">
+                        <i class="bi bi-shield-lock icon-left"></i>
+                        <input type="password" id="confPassword" class="form-control-custom" name="confirm_password" placeholder="Ulangi password" required>
+                        <i class="bi bi-eye-slash icon-right" id="eyeConf" onclick="togglePass('confPassword', 'eyeConf')"></i>
+                    </div>
+
+                    <button type="submit" class="btn-ungu">Daftar</button>
+                    
+                    <!-- Login Redirection -->
+                    <div class="text-center mt-4">
+                        <span class="text-small">Sudah punya akun?</span> 
+                        <a href="{% url 'users:login' %}" class="link-purple">Masuk</a>
+                    </div>
+                </form>
+                
+            </div>
+        </div>
+    </div>
+
+    <!-- Password Visibility Toggle Script -->
+    <script>
+        function togglePass(inputId, iconId) {
+            var input = document.getElementById(inputId);
+            var icon = document.getElementById(iconId);
+            
+            if (input.type === "password") {
+                input.type = "text";
+                icon.classList.replace("bi-eye-slash", "bi-eye");
+            } else {
+                input.type = "password";
+                icon.classList.replace("bi-eye", "bi-eye-slash");
+            }
+        }
+    </script>
+</body>
+</html>

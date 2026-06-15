@@ -1,0 +1,260 @@
+{% extends 'base_dashboard.html' %}
+
+{% block title %}Unggah Materi - EIO Master{% endblock %}
+
+{% block extra_style %}
+<style>
+    /* Mengunci container utama agar pas dengan tinggi layar tanpa scroll luar */
+    .upload-container { 
+        display: flex; 
+        flex-direction: column; 
+        padding: 10px 20px;
+        height: calc(100vh - 100px); 
+        justify-content: center;
+        position: relative;
+    }
+    
+    /* CARD DUA KOLOM */
+    .upload-card { 
+        background: var(--white); 
+        border-radius: 28px; 
+        padding: 35px; 
+        box-shadow: 0 15px 50px rgba(0,0,0,0.03); 
+        border: 1px solid #f1f5f9; 
+        width: 100%; 
+        max-width: 950px; 
+        margin: 0 auto;
+        position: relative; /* Untuk posisi tombol home absolute */
+    }
+    
+    /* TOMBOL HOME DI SUDUT KANAN ATAS CARD */
+    .home-link {
+        position: absolute;
+        top: 30px;
+        right: 35px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-weight: 800;
+        color: #64748b;
+        text-decoration: none;
+        font-size: 0.9rem;
+        transition: all 0.2s ease;
+    }
+    .home-btn {
+        background: var(--white);
+        border: 1px solid #e2e8f0;
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #475569;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+        transition: all 0.2s ease;
+    }
+    .home-link:hover .home-btn {
+        background: #f5f3ff;
+        border-color: #633cf5;
+        color: #633cf5;
+    }
+    .home-link:hover {
+        color: #633cf5;
+    }
+    
+    .upload-header { text-align: left; margin-bottom: 25px; border-bottom: 1px solid #f1f5f9; padding-bottom: 15px; width: 85%; }
+    .upload-header h2 { font-weight: 800; color: #1e293b; font-size: 1.6rem; margin-bottom: 5px; }
+    .upload-header p.subtitle { color: #64748b; font-size: 0.9rem; font-weight: 500; margin: 0; }
+
+    /* Grid layout untuk memisahkan form input dan dropzone file */
+    .split-grid { 
+        display: grid; 
+        grid-template-columns: 1fr 1fr; 
+        gap: 30px; 
+        align-items: start;
+    }
+
+    .form-group { text-align: left; margin-bottom: 18px; position: relative; }
+    .custom-label { font-size: 0.8rem; font-weight: 800; color: #1e293b; margin-bottom: 8px; display: block; text-transform: uppercase; letter-spacing: 0.5px; }
+    
+    /* Wrapper label untuk meletakkan counter di sebelah kanan */
+    .label-wrapper { display: flex; justify-content: space-between; align-items: center; }
+    .char-counter { font-size: 0.75rem; font-weight: 700; color: #94a3b8; }
+    .char-counter.limit-near { color: #ef4444; }
+
+    .custom-input { 
+        width: 100%; 
+        background: #f8fafc; 
+        border: 1px solid #e2e8f0; 
+        border-radius: 12px; 
+        padding: 12px 15px; 
+        font-size: 0.9rem; 
+        color: #475569; 
+        font-weight: 600; 
+        outline: none; 
+        transition: all 0.2s ease; 
+    }
+    .custom-input:focus { border-color: #633cf5; background: var(--white); box-shadow: 0 0 0 3px rgba(99, 60, 245, 0.08); }
+
+    /* AREA UPLOAD FILE ULTRA-MODERN */
+    .drop-zone { 
+        border: 2px dashed #cbd5e1; 
+        border-radius: 20px; 
+        height: 100%; 
+        min-height: 220px; 
+        display: flex; 
+        flex-direction: column; 
+        align-items: center; 
+        justify-content: center; 
+        padding: 20px; 
+        text-align: center; 
+        cursor: pointer; 
+        transition: all 0.25s ease; 
+        background: #f8fafc; 
+    }
+    .drop-zone:hover, .drop-zone.has-file { border-color: #633cf5; background: #f5f3ff; }
+    .drop-zone i { font-size: 2.8rem; color: #a5b4fc; margin-bottom: 12px; transition: 0.2s; }
+    .drop-zone:hover i, .drop-zone.has-file i { color: #633cf5; transform: translateY(-3px); }
+    .drop-zone h5 { font-weight: 800; color: #1e293b; font-size: 0.95rem; margin-bottom: 4px; }
+    .drop-zone p { color: #94a3b8; font-size: 0.8rem; font-weight: 600; margin-bottom: 8px; }
+    .drop-zone small { color: #cbd5e1; font-size: 0.7rem; font-weight: 700; background: #fff; padding: 4px 10px; border-radius: 6px; box-shadow: 0 2px 5px rgba(0,0,0,0.01); }
+
+    /* Action Wrapper di bawah */
+    .action-wrapper { grid-column: 1 / -1; margin-top: 10px; padding-top: 15px; border-top: 1px solid #f1f5f9; }
+    .btn-submit { 
+        width: 100%; 
+        background: #633cf5; 
+        color: white; 
+        border: none; 
+        border-radius: 12px; 
+        padding: 14px; 
+        font-weight: 800; 
+        font-size: 0.95rem; 
+        cursor: pointer; 
+        transition: all 0.2s ease; 
+        box-shadow: 0 6px 16px rgba(99, 60, 245, 0.2); 
+        display: flex; 
+        justify-content: center; 
+        align-items: center; 
+        gap: 10px; 
+    }
+    .btn-submit:hover { transform: translateY(-1px); box-shadow: 0 10px 20px rgba(99, 60, 245, 0.25); }
+
+    .alert { padding: 12px 15px; border-radius: 12px; margin-bottom: 15px; font-weight: 700; font-size: 0.85rem; text-align: left; }
+    .alert-danger { background-color: #fef2f2; color: #ef4444; border: 1px solid #fecaca; }
+    .alert-success { background-color: #ecfdf5; color: #10b981; border: 1px solid #a7f3d0; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="upload-container">
+
+    <div class="upload-card">
+        <a href="{% url 'users:dashboard' %}" class="home-link" title="Kembali ke Beranda">
+            <span></span> <div class="home-btn"><i class="fa-solid fa-house"></i></div> 
+        </a>
+
+        <div class="upload-header">
+            <h2>Analisis Modul Baru</h2>
+            <p class="subtitle">Sistem AI akan otomatis membaca struktur inti dokumen dan menyiapkan ruang evaluasi belajar untukmu.</p>
+        </div>
+
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert {% if message.tags == 'error' %}alert-danger{% else %}alert-success{% endif %}">
+                    <i class="fa-solid {% if message.tags == 'error' %}fa-circle-xmark{% else %}fa-circle-check{% endif %} me-2"></i>
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <form action="{% url 'documents:upload' %}" method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            
+            <div class="split-grid">
+                <div>
+                    <div class="form-group">
+                        <label class="custom-label">Judul Modul</label>
+                        <input type="text" class="custom-input" name="judul_modul" maxlength="50" placeholder="Cth: Pemrograman Mobile Pertemuan 1" required>
+                    </div>
+
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <div class="label-wrapper">
+                            <label class="custom-label">Deskripsi Singkat / Catatan Materi</label>
+                            <span class="char-counter" id="counter">0/100</span>
+                        </div>
+                        <textarea class="custom-input" id="deskripsi" name="deskripsi_singkat" rows="5" maxlength="100" placeholder="Cth: Membahas konsep Polimorfisme dan Magic Methods pada modul lanjutan Python." style="resize: none; height: 122px;" required></textarea>
+                    </div>
+                </div>
+
+                <div style="height: 100%;">
+                    <label class="custom-label">Dokumen Materi (PDF, Word, PPT)</label>
+                    <div class="drop-zone" id="drop-zone" onclick="document.getElementById('file_materi').click()">
+                        <input type="file" id="file_materi" name="file_dokumen" accept=".pdf,.doc,.docx,.pptx" style="display: none;" required onchange="handleFileSelect(this)">
+                        
+                        <div id="upload-content">
+                            <i class="fa-solid fa-cloud-arrow-up"></i>
+                            <h5 id="file-name-display">Drag & Drop file di sini</h5>
+                            <p id="file-instruction">Atau klik untuk menelusuri dokumen</p>
+                            <small>Mendukung PDF, DOCX, PPTX (Maks: 10MB)</small>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="action-wrapper">
+                    <button type="submit" class="btn-submit" id="btn-submit">
+                        <i class="fa-solid fa-microchip"></i> 
+                        <span id="btn-text">Mulai Proses Analisis AI</span>
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    // LOGIKA LIVE CHARACTER COUNTER
+    const textarea = document.getElementById('deskripsi');
+    const counter = document.getElementById('counter');
+
+    textarea.addEventListener('input', function() {
+        const currentLength = textarea.value.length;
+        counter.textContent = `${currentLength}/100`;
+
+        // Kasih efek warna merah kalau teks sudah menyentuh 90 karakter ke atas
+        if (currentLength >= 90) {
+            counter.classList.add('limit-near');
+        } else {
+            counter.classList.remove('limit-near');
+        }
+    });
+
+    function handleFileSelect(input) {
+        const file = input.files[0];
+        const dropZone = document.getElementById('drop-zone');
+        const nameDisplay = document.getElementById('file-name-display');
+        const instruction = document.getElementById('file-instruction');
+
+        if (file) {
+            dropZone.classList.add('has-file');
+            nameDisplay.textContent = file.name;
+            nameDisplay.style.color = '#633cf5';
+            instruction.textContent = "Berkas berhasil dimuat!";
+        } else {
+            dropZone.classList.remove('has-file');
+            nameDisplay.textContent = "Drag & Drop file di sini";
+            nameDisplay.style.color = '#1e293b';
+            instruction.textContent = "Atau klik untuk menelusuri dokumen";
+        }
+    }
+
+    document.querySelector('form').onsubmit = function() {
+        const btn = document.getElementById('btn-submit');
+        const btnText = document.getElementById('btn-text');
+        btn.style.opacity = "0.7";
+        btn.style.pointerEvents = "none";
+        btnText.textContent = "Sedang Menganalisis Dokumen...";
+    };
+</script>
+{% endblock %}

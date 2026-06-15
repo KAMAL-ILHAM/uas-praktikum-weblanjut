@@ -1,0 +1,766 @@
+{% extends 'base_dashboard.html' %}
+
+{% block title %}Kuis Essay - {{ dokumen.nama_file }}{% endblock %}
+
+{% block extra_style %}
+<style>
+    /* ========================================= */
+    /* KUIS (ESSAY) - HEADER & TIMER             */
+    /* ========================================= */
+    .latihan-header { 
+        display: flex; 
+        justify-content: space-between; 
+        align-items: center; 
+        margin-bottom: 25px; 
+    }
+    
+    .btn-close-latihan { 
+        background: var(--white); 
+        border: 1px solid #e2e8f0; 
+        width: 40px; 
+        height: 40px; 
+        border-radius: 12px; 
+        display: flex; 
+        align-items: center; 
+        justify-content: center; 
+        color: var(--text-main); 
+        font-size: 1.1rem; 
+        cursor: pointer; 
+        transition: 0.2s; 
+        box-shadow: 0 2px 10px rgba(0,0,0,0.02); 
+    }
+    
+    .btn-close-latihan:hover { 
+        background: #fef2f2; 
+        color: #ef4444; 
+        border-color: #fecaca; 
+    }
+    
+    .latihan-title { 
+        font-size: 1.3rem; 
+        font-weight: 800; 
+        color: var(--text-main); 
+        margin: 0; 
+    }
+    
+    .timer-badge { 
+        background: #fef2f2; 
+        color: #ef4444; 
+        font-weight: 800; 
+        font-size: 0.95rem; 
+        padding: 10px 20px; 
+        border-radius: 50px; 
+        border: 1px solid #fecaca; 
+        display: flex; 
+        align-items: center; 
+        gap: 8px; 
+    }
+
+    @keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.05); box-shadow: 0 0 15px rgba(239, 68, 68, 0.4); }
+        100% { transform: scale(1); }
+    }
+
+    /* ========================================= */
+    /* PROGRESS BAR                              */
+    /* ========================================= */
+    .progress-info { 
+        display: flex; 
+        justify-content: space-between; 
+        align-items: center; 
+        font-size: 0.9rem; 
+        font-weight: 700; 
+        color: #64748b; 
+        margin-bottom: 10px; 
+    }
+    
+    .progress-percentage { 
+        color: var(--primary); 
+    }
+    
+    .progress-bar-bg { 
+        width: 100%; 
+        height: 8px; 
+        background: #e2e8f0; 
+        border-radius: 10px; 
+        overflow: hidden; 
+        margin-bottom: 30px; 
+    }
+    
+    .progress-bar-fill { 
+        height: 100%; 
+        background: var(--primary); 
+        border-radius: 10px; 
+        width: 0%; 
+        transition: width 0.4s ease; 
+    }
+
+    /* ========================================= */
+    /* QUESTION CARD & ESSAY INPUT               */
+    /* ========================================= */
+    .question-card { 
+        background: var(--white); 
+        border-radius: 20px; 
+        padding: 35px 40px; 
+        box-shadow: 0 10px 30px rgba(0,0,0,0.02); 
+        border: 1px solid #f1f5f9; 
+        margin-bottom: 25px; 
+        position: relative; 
+    }
+    
+    .badge-question { 
+        background: #0f172a; 
+        color: white; 
+        font-size: 0.75rem; 
+        font-weight: 800; 
+        padding: 6px 16px; 
+        border-radius: 8px; 
+        text-transform: uppercase; 
+        letter-spacing: 1px; 
+        position: absolute; 
+        top: -14px; 
+        left: 40px; 
+        box-shadow: 0 4px 10px rgba(15, 23, 42, 0.2); 
+    }
+    
+    .question-text { 
+        font-size: 1.25rem; 
+        font-weight: 800; 
+        color: var(--text-main); 
+        line-height: 1.6; 
+        margin: 0; 
+    }
+
+    .essay-container { 
+        margin-bottom: 30px; 
+    }
+    
+    .essay-textarea { 
+        width: 100%; 
+        height: 280px; 
+        border: 2px solid #e2e8f0; 
+        border-radius: 16px; 
+        padding: 25px; 
+        font-size: 1.05rem; 
+        color: var(--text-main); 
+        resize: none; 
+        outline: none; 
+        transition: 0.2s; 
+        font-family: inherit; 
+        line-height: 1.7; 
+        box-shadow: inset 0 2px 10px rgba(0,0,0,0.01); 
+    }
+    
+    .essay-textarea:focus { 
+        border-color: var(--primary); 
+        background: #fefeff; 
+        box-shadow: 0 0 0 4px rgba(99, 60, 245, 0.1); 
+    }
+    
+    .essay-textarea::placeholder { 
+        color: #cbd5e1; 
+    }
+    
+    .word-count { 
+        text-align: right; 
+        font-size: 0.85rem; 
+        font-weight: 700; 
+        color: #64748b; 
+        margin-top: 10px; 
+    }
+    
+    .word-count.limit-reached { 
+        color: #ef4444; 
+    }
+
+    /* ========================================= */
+    /* NAVIGATION BUTTONS                        */
+    /* ========================================= */
+    .nav-buttons { 
+        display: flex; 
+        justify-content: space-between; 
+        align-items: center; 
+    }
+    
+    .btn-nav { 
+        padding: 14px 24px; 
+        border-radius: 12px; 
+        font-weight: 800; 
+        font-size: 0.95rem; 
+        cursor: pointer; 
+        transition: 0.2s; 
+        display: flex; 
+        align-items: center; 
+        gap: 10px; 
+        border: none; 
+    }
+    
+    .btn-prev { 
+        background: var(--white); 
+        color: #64748b; 
+        border: 1px solid #e2e8f0; 
+    }
+    
+    .btn-prev:hover { 
+        background: #f8fafc; 
+        color: var(--text-main); 
+    }
+    
+    .btn-prev:disabled { 
+        opacity: 0.5; 
+        cursor: not-allowed; 
+    }
+    
+    .btn-next { 
+        background: var(--primary); 
+        color: white; 
+        box-shadow: 0 4px 15px rgba(99, 60, 245, 0.25); 
+    }
+    
+    .btn-next:hover { 
+        transform: translateY(-2px); 
+        box-shadow: 0 8px 20px rgba(99, 60, 245, 0.35); 
+    }
+    
+    .btn-finish-quiz { 
+        background: #10b981; 
+        color: white; 
+        box-shadow: 0 4px 15px rgba(16, 185, 129, 0.25); 
+        display: none; 
+    }
+    
+    .btn-finish-quiz:hover { 
+        transform: translateY(-2px); 
+        box-shadow: 0 8px 20px rgba(16, 185, 129, 0.35); 
+    }
+    
+    .btn-finish-quiz:disabled { 
+        opacity: 0.7; 
+        cursor: not-allowed; 
+        transform: none; 
+        box-shadow: none; 
+    }
+
+    /* ========================================= */
+    /* TAMPILAN LAPORAN EVALUASI AI              */
+    /* ========================================= */
+    #result-view { 
+        display: none; 
+        animation: fadeIn 0.4s ease; 
+    }
+    
+    @keyframes fadeIn { 
+        from { opacity: 0; transform: translateY(10px); } 
+        to { opacity: 1; transform: translateY(0); } 
+    }
+
+    .result-summary-card { 
+        background: var(--white); 
+        border-radius: 24px; 
+        padding: 40px; 
+        box-shadow: 0 10px 40px rgba(0,0,0,0.03); 
+        border: 1px solid #f1f5f9; 
+        margin-bottom: 40px; 
+        display: flex; 
+        align-items: center; 
+        gap: 30px; 
+    }
+    
+    .score-circle-purple { 
+        width: 110px; 
+        height: 110px; 
+        border-radius: 50%; 
+        border: 6px solid var(--primary); 
+        display: flex; 
+        align-items: center; 
+        justify-content: center; 
+        font-size: 2.5rem; 
+        font-weight: 800; 
+        color: var(--text-main); 
+        flex-shrink: 0; 
+        box-shadow: 0 10px 30px rgba(99, 60, 245, 0.2); 
+    }
+    
+    .summary-text h2 { 
+        margin: 0 0 8px 0; 
+        font-size: 1.6rem; 
+        font-weight: 800; 
+        color: var(--text-main); 
+    }
+    
+    .summary-text p { 
+        margin: 0; 
+        color: #64748b; 
+        font-size: 1rem; 
+        font-weight: 500; 
+        line-height: 1.6; 
+    }
+    
+    /* List Review AI */
+    .review-header { 
+        display: flex; 
+        align-items: center; 
+        gap: 12px; 
+        font-size: 1.3rem; 
+        font-weight: 800; 
+        color: var(--text-main); 
+        margin-bottom: 25px; 
+    }
+    
+    .review-header i { 
+        color: var(--primary); 
+        font-size: 1.5rem; 
+    }
+    
+    .review-list { 
+        display: flex; 
+        flex-direction: column; 
+        gap: 30px; 
+        margin-bottom: 40px; 
+    }
+    
+    .review-item { 
+        background: var(--white); 
+        border: 1px solid #e2e8f0; 
+        border-radius: 20px; 
+        padding: 30px; 
+        box-shadow: 0 4px 15px rgba(0,0,0,0.02); 
+    }
+    
+    .review-item-header { 
+        display: flex; 
+        justify-content: space-between; 
+        align-items: center; 
+        margin-bottom: 20px; 
+    }
+    
+    .badge-soal { 
+        background: #f1f5f9; 
+        color: #64748b; 
+        font-size: 0.8rem; 
+        font-weight: 800; 
+        padding: 8px 16px; 
+        border-radius: 50px; 
+    }
+    
+    .badge-nilai { 
+        font-size: 0.85rem; 
+        font-weight: 800; 
+        padding: 8px 16px; 
+        border-radius: 50px; 
+        background: #ecfdf5; 
+        color: #10b981; 
+    }
+    
+    .review-question { 
+        font-size: 1.15rem; 
+        font-weight: 800; 
+        color: var(--text-main); 
+        margin: 0 0 20px 0; 
+        line-height: 1.5; 
+    }
+    
+    .label-jawaban { 
+        font-size: 0.75rem; 
+        font-weight: 800; 
+        color: #94a3b8; 
+        text-transform: uppercase; 
+        letter-spacing: 1px; 
+        margin-bottom: 8px; 
+        display: block; 
+    }
+    
+    .answer-box-user { 
+        background: #f8fafc; 
+        border: 1px solid #e2e8f0; 
+        border-radius: 12px; 
+        padding: 20px; 
+        color: #334155; 
+        font-weight: 500; 
+        font-size: 1rem; 
+        line-height: 1.7; 
+        margin-bottom: 20px; 
+    }
+    
+    .ai-note-box { 
+        background: #eff6ff; 
+        border: 1px solid #bfdbfe; 
+        border-radius: 12px; 
+        padding: 20px; 
+    }
+    
+    .ai-note-label { 
+        font-size: 0.75rem; 
+        font-weight: 800; 
+        color: #4f46e5; 
+        text-transform: uppercase; 
+        letter-spacing: 1px; 
+        margin-bottom: 10px; 
+        display: block; 
+    }
+    
+    .ai-note-text { 
+        color: #1e40af; 
+        font-size: 0.95rem; 
+        line-height: 1.6; 
+        margin: 0; 
+        font-weight: 500; 
+    }
+    
+    /* Utilities */
+    .chat-bot {
+        display: none !important;
+    }
+    
+    .btn-back-home { 
+        width: 100%; 
+        background: var(--white); 
+        color: var(--text-main); 
+        border: 1px solid #e2e8f0; 
+        border-radius: 16px; 
+        padding: 18px; 
+        font-weight: 800; 
+        font-size: 1.1rem; 
+        cursor: pointer; 
+        transition: 0.2s; 
+        box-shadow: 0 4px 15px rgba(0,0,0,0.02); 
+        text-align: center; 
+        text-decoration: none; 
+        display: flex; 
+        justify-content: center; 
+        align-items: center; 
+        gap: 10px; 
+    }
+    
+    .btn-back-home:hover { 
+        background: #f8fafc; 
+        transform: translateY(-2px); 
+        box-shadow: 0 8px 20px rgba(0,0,0,0.05); 
+        color: var(--text-main); 
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div id="quiz-view">
+    <div class="latihan-header">
+        <div class="d-flex align-items-center gap-3">
+            <button class="btn-close-latihan" onclick="window.location.href=`{% url 'users:dashboard' %}`">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <h3 class="latihan-title">Latihan Uraian: {{ dokumen.nama_file }}</h3>
+        </div>
+        <div class="timer-badge" id="timerBadge">
+            <i class="fa-regular fa-clock"></i> <span id="timerText">00:00</span>
+        </div>
+    </div>
+
+    <div class="progress-info">
+        <span id="progressText">Memuat Soal...</span>
+        <span class="progress-percentage" id="progressPercent">0%</span>
+    </div>
+    <div class="progress-bar-bg">
+        <div class="progress-bar-fill" id="progressBar"></div>
+    </div>
+
+    <div class="question-card">
+        <span class="badge-question" id="badgeQuestion">MEMUAT...</span>
+        <p class="question-text" id="questionText">Mohon tunggu, AI sedang menyiapkan soal essay...</p>
+    </div>
+
+    <div class="essay-container">
+        <textarea class="essay-textarea" id="essayInput" placeholder="Ketik jawaban argumenmu di sini secara detail..." oninput="updateWordCount()"></textarea>
+        <div class="word-count" id="wordCountText">0 / 500 kata</div>
+    </div>
+
+    <div class="nav-buttons">
+        <button class="btn-nav btn-prev" id="btnPrev" onclick="navigate(-1)" disabled>
+            <i class="fa-solid fa-chevron-left"></i> Sebelumnya
+        </button>
+        <button class="btn-nav btn-next" id="btnNext" onclick="navigate(1)">
+            Selanjutnya <i class="fa-solid fa-chevron-right"></i>
+        </button>
+        <button class="btn-nav btn-finish-quiz" id="btnFinish" onclick="finishQuiz()">
+            Kirim & Evaluasi Jawaban <i class="fa-solid fa-paper-plane"></i>
+        </button>
+    </div>
+</div>
+
+<div id="result-view">
+    <div class="latihan-header">
+        <div class="d-flex align-items-center gap-3">
+            <button class="btn-close-latihan" onclick="location.reload()">
+                <i class="fa-solid fa-rotate-right"></i>
+            </button>
+            <h3 class="latihan-title">Laporan Evaluasi AI</h3>
+        </div>
+        <button class="btn-close-latihan"><i class="fa-solid fa-share-nodes"></i></button>
+    </div>
+
+    <div class="result-summary-card">
+        <div class="score-circle-purple" id="finalScoreCircle">
+            <i class="fa-solid fa-spinner fa-spin"></i>
+        </div>
+        <div class="summary-text">
+            <h2>Evaluasi Selesai! 🎉</h2>
+            <p>Berikut adalah hasil penilaian objektif dari AI terhadap argumenmu. Perhatikan catatan evaluasi untuk meningkatkan pemahaman pada materi ini.</p>
+        </div>
+    </div>
+
+    <div class="review-header">
+        <i class="fa-solid fa-robot"></i> Review & Koreksi AI
+    </div>
+    
+    <div class="review-list" id="reviewListContainer"></div>
+
+    <a href="{% url 'users:dashboard' %}" class="btn-back-home">
+        <i class="fa-solid fa-house"></i> Kembali ke Dasbor Utama
+    </a>
+</div>
+
+<script>
+    // CSRF Token Management
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    // Initialize Dynamic JSON Data
+    const rawData = JSON.parse('{{ data|escapejs }}' || '[]');
+    let questions = [];
+    
+    if (rawData && rawData.length > 0) {
+        questions = rawData.map(item => ({
+            q: item.soal,
+            key: item.kunci
+        }));
+    }
+
+    // State Variables
+    let currentIndex = 0;
+    let totalQuestions = 0;
+    let userAnswers = []; 
+    const maxWords = 500;
+    
+    // Timer Variables
+    let totalSeconds = 0; 
+    let timerInterval;
+
+    // DOM Elements Cache
+    const qText = document.getElementById('questionText');
+    const badgeQ = document.getElementById('badgeQuestion');
+    const essayInput = document.getElementById('essayInput');
+    const wordCountText = document.getElementById('wordCountText');
+    const progressText = document.getElementById('progressText');
+    const progressPercent = document.getElementById('progressPercent');
+    const progressBar = document.getElementById('progressBar');
+    
+    const btnPrev = document.getElementById('btnPrev');
+    const btnNext = document.getElementById('btnNext');
+    const btnFinish = document.getElementById('btnFinish');
+    const timerText = document.getElementById('timerText');
+
+    // Quiz Initialization
+    function initQuiz() {
+        if(questions.length === 0) {
+            qText.textContent = "Gagal memuat soal. Silakan kembali dan generate ulang.";
+            badgeQ.textContent = "ERROR";
+            essayInput.disabled = true;
+            return;
+        }
+
+        totalQuestions = questions.length;
+        userAnswers = new Array(totalQuestions).fill("");
+        
+        // Timer Setup: 3 Minutes per question
+        totalSeconds = totalQuestions * 3 * 60; 
+
+        renderQuestion();
+        startTimer();
+    }
+
+    // Word Counter & Auto-Save
+    window.updateWordCount = function() {
+        const text = essayInput.value.trim();
+        const wordCount = text === "" ? 0 : text.split(/\s+/).length;
+        
+        wordCountText.textContent = `${wordCount} / ${maxWords} kata`;
+        
+        if (wordCount > maxWords) {
+            wordCountText.classList.add('limit-reached');
+        } else {
+            wordCountText.classList.remove('limit-reached');
+        }
+
+        userAnswers[currentIndex] = essayInput.value;
+    };
+
+    // Render Question & Progress
+    function renderQuestion() {
+        const currentQ = questions[currentIndex];
+        
+        qText.textContent = currentQ.q;
+        badgeQ.textContent = `SOAL ${currentIndex + 1}`;
+        progressText.textContent = `Pertanyaan ${currentIndex + 1} dari ${totalQuestions}`;
+        
+        const percent = Math.round(((currentIndex + 1) / totalQuestions) * 100);
+        progressPercent.textContent = `${percent}%`;
+        progressBar.style.width = `${percent}%`;
+
+        essayInput.value = userAnswers[currentIndex] || "";
+        updateWordCount();
+
+        btnPrev.disabled = currentIndex === 0;
+        
+        if (currentIndex === totalQuestions - 1) {
+            btnNext.style.display = 'none';
+            btnFinish.style.display = 'flex';
+        } else {
+            btnNext.style.display = 'flex';
+            btnFinish.style.display = 'none';
+        }
+    }
+
+    // Navigation Handler
+    window.navigate = function(step) {
+        currentIndex += step;
+        renderQuestion();
+    };
+
+    // Timer Logic
+    function startTimer() {
+        updateTimerUI();
+        timerInterval = setInterval(() => {
+            totalSeconds--;
+            updateTimerUI();
+
+            if (totalSeconds <= 0) {
+                clearInterval(timerInterval);
+                finishQuiz();
+            }
+        }, 1000);
+    }
+    
+    function updateTimerUI() {
+        const m = Math.floor(totalSeconds / 60).toString().padStart(2, '0');
+        const s = (totalSeconds % 60).toString().padStart(2, '0');
+        timerText.textContent = `${m}:${s}`;
+
+        // Pulse animation if time is under 1 minute
+        if (totalSeconds > 0 && totalSeconds <= 60) {
+            document.getElementById('timerBadge').style.animation = 'pulse 1s infinite';
+        } else {
+            document.getElementById('timerBadge').style.animation = 'none';
+        }
+    }
+
+    // Submission & AI Evaluation Request
+    window.finishQuiz = async function() {
+        updateWordCount(); // Save final keystrokes
+        clearInterval(timerInterval);
+
+        const originalBtnText = btnFinish.innerHTML;
+        btnFinish.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> AI Sedang Mengoreksi...';
+        btnFinish.disabled = true;
+
+        const payloadData = questions.map((q, index) => ({
+            soal: q.q,
+            kunci: q.key,
+            jawaban_user: userAnswers[index] || ""
+        }));
+
+        try {
+            const response = await fetch("{% url 'latihan:api_evaluasi_essay' %}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                body: JSON.stringify({ data_evaluasi: payloadData })
+            });
+
+            const data = await response.json();
+
+            if (data.status === 'success') {
+                tampilkanLaporan(data.hasil);
+            } else {
+                alert("Gagal mengoreksi jawaban: " + data.message);
+                btnFinish.innerHTML = originalBtnText;
+                btnFinish.disabled = false;
+            }
+        } catch (error) {
+            console.error("Error Fetch API:", error);
+            alert("Terjadi kesalahan jaringan saat memanggil AI Evaluator.");
+            btnFinish.innerHTML = originalBtnText;
+            btnFinish.disabled = false;
+        }
+    };
+
+    // Render Evaluation Report UI
+    function tampilkanLaporan(hasilKoreksiAI) {
+        const reviewListContainer = document.getElementById('reviewListContainer');
+        reviewListContainer.innerHTML = '';
+        
+        let totalScore = 0;
+
+        questions.forEach((q, index) => {
+            const userAnswerText = userAnswers[index] && userAnswers[index].trim() !== "" 
+                                   ? userAnswers[index].replace(/\n/g, '<br>') 
+                                   : "<i>Tidak ada jawaban yang dikirimkan.</i>";
+            
+            const aiScore = hasilKoreksiAI[index]?.skor || 0;
+            const aiNote = hasilKoreksiAI[index]?.catatan || "Tidak ada catatan evaluasi dari AI.";
+            
+            totalScore += aiScore;
+
+            const itemDiv = document.createElement('div');
+            itemDiv.className = `review-item`;
+            
+            itemDiv.innerHTML = `
+                <div class="review-item-header">
+                    <span class="badge-soal">Pertanyaan ${index + 1}</span>
+                    <span class="badge-nilai"><i class="fa-solid fa-check"></i> Nilai: ${aiScore}/100</span>
+                </div>
+                <h4 class="review-question">${q.q}</h4>
+                
+                <span class="label-jawaban">JAWABANMU:</span>
+                <div class="answer-box-user">${userAnswerText}</div>
+                
+                <div class="ai-note-box">
+                    <span class="ai-note-label"><i class="fa-solid fa-robot"></i> CATATAN & EVALUASI AI</span>
+                    <p class="ai-note-text">${aiNote.replace(/\n/g, '<br>')}</p>
+                </div>
+            `;
+            reviewListContainer.appendChild(itemDiv);
+        });
+
+        // Calculate and Render Final Average Score
+        const finalScore = Math.round(totalScore / totalQuestions);
+        document.getElementById('finalScoreCircle').innerHTML = finalScore;
+
+        // Toggle Views
+        document.getElementById('quiz-view').style.display = 'none';
+        document.getElementById('result-view').style.display = 'block';
+        window.scrollTo(0, 0);
+    }
+
+    // Run Initialization
+    try {
+        initQuiz();
+    } catch(e) {
+        console.error("Gagal menginisialisasi quiz:", e);
+        qText.textContent = "Terjadi kesalahan sistem saat merender kuis.";
+    }
+</script>
+{% endblock %}

@@ -1,0 +1,583 @@
+{% extends 'base_dashboard.html' %}
+{% load i18n %}
+
+{% block title %}Pengaturan - EIO Master{% endblock %}
+
+{% block extra_style %}
+<style>
+    /* Header & Profil */
+    .top-header { 
+        display: flex; 
+        justify-content: space-between; 
+        align-items: center; 
+        margin-bottom: 30px; 
+    }
+    
+    .header-title { 
+        display: flex; 
+        align-items: center; 
+        gap: 15px; 
+    }
+    
+    .header-icon { 
+        background: rgba(99, 60, 245, 0.1); 
+        color: var(--primary); 
+        width: 48px; 
+        height: 48px; 
+        border-radius: 14px; 
+        display: flex; 
+        align-items: center; 
+        justify-content: center; 
+        font-size: 1.4rem; 
+    }
+    
+    .header-title h2 { 
+        margin: 0; 
+        font-weight: 800; 
+        color: var(--text-main); 
+        font-size: 1.8rem; 
+    }
+
+    .profile-desktop-card { 
+        background: var(--white); 
+        border-radius: 20px; 
+        position: relative; 
+        margin-bottom: 35px; 
+        box-shadow: 0 4px 20px rgba(0,0,0,0.03); 
+        border: 1px solid #e2e8f0; 
+        overflow: hidden; 
+        width: 100%; 
+    }
+    
+    .profile-cover { 
+        height: 120px; 
+        background: linear-gradient(135deg, #633cf5 0%, #8668ff 100%); 
+        position: relative; 
+    }
+    
+    .profile-info-container { 
+        display: flex; 
+        align-items: flex-end; 
+        padding: 0 40px 35px; 
+        margin-top: -50px; 
+    }
+    
+    .avatar-wrapper { 
+        position: relative; 
+        width: 110px; 
+        height: 110px; 
+        margin-right: 25px; 
+    }
+    
+    .avatar-img { 
+        width: 100%; 
+        height: 100%; 
+        border-radius: 50%; 
+        object-fit: cover; 
+        border: 5px solid var(--white); 
+        background: var(--white); 
+    }
+    
+    .edit-badge { 
+        position: absolute; 
+        bottom: 5px; 
+        right: 0; 
+        background: var(--primary); 
+        color: #fff; 
+        width: 34px; 
+        height: 34px; 
+        border-radius: 50%; 
+        display: flex; 
+        align-items: center; 
+        justify-content: center; 
+        font-size: 0.9rem; 
+        border: 3px solid #fff; 
+        cursor: pointer; 
+        transition: 0.2s; 
+    }
+    
+    .profile-text-info h3 { 
+        font-size: 1.5rem; 
+        font-weight: 800; 
+        color: var(--text-main); 
+        margin-bottom: 4px; 
+    }
+    
+    .profile-text-info p { 
+        font-size: 0.95rem; 
+        color: #64748b; 
+        font-weight: 600; 
+        margin: 0; 
+    }
+    
+    .btn-edit-profile { 
+        margin-left: auto; 
+        background: #f1f5f9; 
+        color: var(--primary); 
+        border: none; 
+        border-radius: 12px; 
+        padding: 10px 20px; 
+        font-weight: 700; 
+        transition: 0.2s; 
+        cursor: pointer; 
+    }
+    
+    .btn-edit-profile:hover { 
+        background: #e2e8f0; 
+    }
+
+    /* Layout Utama */
+    .content-wrapper {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 40px;
+        align-items: start;
+        padding-bottom: 50px;
+    }
+
+    .settings-column { 
+        display: flex; 
+        flex-direction: column; 
+        gap: 30px; 
+    }
+    
+    .section-title { 
+        font-size: 0.75rem; 
+        font-weight: 800; 
+        color: #64748b; 
+        text-transform: uppercase; 
+        letter-spacing: 1px; 
+        margin: 0 0 12px 5px; 
+    }
+    
+    .settings-card { 
+        background: var(--white); 
+        border-radius: 16px; 
+        border: 1px solid #e2e8f0; 
+        overflow: hidden; 
+        box-shadow: 0 4px 15px rgba(0,0,0,0.02); 
+    }
+    
+    /* Item Pengaturan */
+    .setting-item { 
+        display: flex; 
+        align-items: center; 
+        padding: 16px 20px; 
+        text-decoration: none; 
+        color: #1e293b; 
+        transition: 0.2s; 
+        border-bottom: 1px solid #f1f5f9; 
+        cursor: pointer; 
+    }
+    
+    .setting-item:last-child { border-bottom: none; }
+    .setting-item:hover, .setting-item.active-state { background: #f8fafc; }
+    
+    .icon-box { 
+        width: 38px; 
+        height: 38px; 
+        border-radius: 10px; 
+        display: flex; 
+        align-items: center; 
+        justify-content: center; 
+        margin-right: 15px; 
+        font-size: 1rem; 
+        flex-shrink: 0; 
+    }
+    
+    /* Warna Ikon */
+    .bg-blue { background: #eff6ff; color: #3b82f6; }
+    .bg-orange { background: #fff7ed; color: #f97316; }
+    .bg-green { background: #f0fdf4; color: #22c55e; }
+    .bg-gray { background: #f1f5f9; color: #64748b; }
+    .bg-purple { background: #f5f3ff; color: var(--primary); }
+    .bg-red { background: #fef2f2; color: #ef4444; }
+
+    .setting-text { flex: 1; font-weight: 600; font-size: 0.95rem; }
+    .setting-chevron { color: #cbd5e1; font-size: 1rem; }
+    .text-value { font-size: 0.85rem; color: #64748b; font-weight: 600; margin-right: 15px; }
+
+    /* Toggle Switch */
+    .form-switch { 
+        margin: 0; 
+        display: flex; 
+        align-items: center; 
+        padding-left: 0; 
+    }
+    
+    .form-switch .form-check-input { 
+        width: 44px; 
+        height: 24px; 
+        cursor: pointer; 
+        border-color: #cbd5e1; 
+        margin-left: 0; 
+        border-radius: 24px; 
+    }
+    
+    .form-switch .form-check-input:checked { 
+        background-color: var(--primary); 
+        border-color: var(--primary); 
+    }
+
+    /* Modal Form Styling */
+    .modal-content { border-radius: 16px; border: none; }
+    .modal-header { border-bottom: 1px solid #f1f5f9; background: #fafafa; border-radius: 16px 16px 0 0; }
+    .modal-title { font-weight: 800; color: #1e293b; }
+    .form-label { font-weight: 700; color: #475569; font-size: 0.85rem; margin-bottom: 6px; }
+    .form-control, .form-select { border-radius: 8px; border: 1px solid #cbd5e1; padding: 10px 15px; font-size: 0.9rem; }
+    .form-control:focus, .form-select:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(99, 60, 245, 0.1); }
+    .btn-save-modal { background: var(--primary); color: white; border: none; border-radius: 8px; padding: 10px 20px; font-weight: 700; width: 100%; transition: 0.2s; }
+    .btn-save-modal:hover { background: #5028e3; color: white; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="top-header">
+    <div class="header-title">
+        <div class="header-icon"><i class="fa-solid fa-gear"></i></div>
+        <h2>{% trans "Pengaturan" %}</h2>
+    </div>
+</div>
+
+<!-- Alert Messages -->
+{% if messages %}
+    <div class="mb-4">
+        {% for message in messages %}
+            <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} alert-dismissible fade show shadow-sm" style="border-radius: 12px;" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}
+
+<!-- Kartu Profil -->
+<div class="profile-desktop-card">
+    <div class="profile-cover"></div>
+    <div class="profile-info-container">
+        <div class="avatar-wrapper">
+            {% if request.user.foto_profil %}
+                <img src="{{ request.user.foto_profil.url }}" class="avatar-img" alt="Profile">
+            {% else %}
+                <img src="https://ui-avatars.com/api/?name={{ request.user.username }}&background=633cf5&color=fff&size=200" class="avatar-img" alt="Profile">
+            {% endif %}
+            <div class="edit-badge"><i class="fa-solid fa-camera"></i></div>
+        </div>
+        <div class="profile-text-info mb-1">
+            <h3>{{ request.user.username }}</h3>
+            <p>{{ request.user.email|default:"Email belum diatur" }}</p>
+        </div>
+        <button class="btn-edit-profile mb-1" data-bs-toggle="modal" data-bs-target="#modalEditProfil">Edit Profil</button>
+    </div>
+</div>
+
+<!-- Kontainer Utama (2 Kolom) -->
+<div class="content-wrapper">
+    
+    <!-- Kolom Kiri -->
+    <div class="settings-column">
+        <!-- Akun & Keamanan -->
+        <div class="settings-section">
+            <div class="section-title">Akun & Keamanan</div>
+            <div class="settings-card">
+                <a class="setting-item" data-bs-toggle="modal" data-bs-target="#modalInfoPribadi">
+                    <div class="icon-box bg-blue"><i class="fa-solid fa-user"></i></div>
+                    <div class="setting-text">Informasi Pribadi</div>
+                    <div class="setting-chevron"><i class="fa-solid fa-angle-right"></i></div>
+                </a>
+                <a class="setting-item" data-bs-toggle="modal" data-bs-target="#modalKeamanan">
+                    <div class="icon-box bg-orange"><i class="fa-solid fa-shield-halved"></i></div>
+                    <div class="setting-text">Kata Sandi & Autentikasi</div>
+                    <div class="setting-chevron"><i class="fa-solid fa-angle-right"></i></div>
+                </a>
+                <a href="#" class="setting-item">
+                    <div class="icon-box bg-green"><i class="fa-solid fa-fingerprint"></i></div>
+                    <div class="setting-text">Kunci Biometrik (Passkey)</div>
+                    <div class="setting-chevron"><i class="fa-solid fa-angle-right"></i></div>
+                </a>
+                <a href="#" class="setting-item">
+                    <div class="icon-box bg-gray"><i class="fa-solid fa-laptop"></i></div>
+                    <div class="setting-text">Sesi Perangkat Aktif</div>
+                    <div class="setting-chevron"><i class="fa-solid fa-angle-right"></i></div>
+                </a>
+            </div>
+        </div>
+
+        <!-- Preferensi Aplikasi -->
+        <div class="settings-section">
+            <div class="section-title">Preferensi Aplikasi</div>
+            <div class="settings-card">
+                <div class="setting-item">
+                    <div class="icon-box bg-purple"><i class="fa-solid fa-bell"></i></div>
+                    <div class="setting-text">Notifikasi & Pengingat Tugas</div>
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" checked>
+                    </div>
+                </div>
+                <a href="#" class="setting-item active-state" data-bs-toggle="modal" data-bs-target="#modalBahasa">
+                    <div class="icon-box bg-blue"><i class="fa-solid fa-language"></i></div>
+                    <div class="setting-text">Bahasa Antarmuka</div>
+                    <span class="text-value">
+                        {% get_current_language as LANGUAGE_CODE %}
+                        {% if LANGUAGE_CODE == 'en' %}English{% else %}Indonesia{% endif %}
+                    </span>
+                    <div class="setting-chevron"><i class="fa-solid fa-angle-right"></i></div>
+                </a>
+                <div class="setting-item">
+                    <div class="icon-box bg-orange"><i class="fa-solid fa-moon"></i></div>
+                    <div class="setting-text">Mode Gelap (Dark Mode)</div>
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Kolom Kanan -->
+    <div class="settings-column">
+        <!-- Dukungan & Lainnya -->
+        <div class="settings-section">
+            <div class="section-title">Dukungan & Lainnya</div>
+            <div class="settings-card">
+                <a href="#" class="setting-item">
+                    <div class="icon-box bg-blue"><i class="fa-solid fa-circle-info"></i></div>
+                    <div class="setting-text">Pusat Bantuan & FAQ</div>
+                    <div class="setting-chevron"><i class="fa-solid fa-angle-right"></i></div>
+                </a>
+                <a href="{% url 'users:logout' %}" class="setting-item">
+                    <div class="icon-box bg-red"><i class="fa-solid fa-right-from-bracket"></i></div>
+                    <div class="setting-text" style="color: #ef4444;">Keluar Akun</div>
+                </a>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- ================= MODALS ================= -->
+
+<!-- Modal 1: Edit Profil -->
+<div class="modal fade" id="modalEditProfil" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Edit Profil</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4">
+                <form method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="edit_profil">
+
+                    <div class="mb-3">
+                        <label class="form-label">Ubah Foto Profil</label>
+                        <input type="file" name="foto_profil" class="form-control" accept="image/*">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Username</label>
+                        <input type="text" name="username" class="form-control" value="{{ request.user.username }}" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Bio Singkat</label>
+                        <textarea name="bio" class="form-control" rows="3" placeholder="Ceritakan sedikit tentang dirimu...">{{ request.user.bio|default:'' }}</textarea>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Jenis Kelamin</label>
+                            <select name="jenis_kelamin" class="form-select">
+                                <option value="">Pilih...</option>
+                                <option value="L" {% if request.user.jenis_kelamin == 'L' %}selected{% endif %}>Laki-laki</option>
+                                <option value="P" {% if request.user.jenis_kelamin == 'P' %}selected{% endif %}>Perempuan</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Tanggal Lahir</label>
+                            <input type="date" name="tanggal_lahir" class="form-control" value="{{ request.user.tanggal_lahir|date:'Y-m-d' }}">
+                        </div>
+                    </div>
+                    <button type="submit" class="btn-save-modal mt-2">Simpan Profil</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal 2: Informasi Pribadi -->
+<div class="modal fade" id="modalInfoPribadi" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Informasi Pribadi</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4">
+                <form method="POST">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="informasi_pribadi">
+
+                    <div class="mb-3">
+                        <label class="form-label">Nomor Induk (NISN / NIS / NIM)</label>
+                        <input type="text" name="nomor_induk" class="form-control" value="{{ request.user.nomor_induk|default:'' }}" placeholder="Contoh: 220123...">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Nama Instansi (Universitas / Sekolah)</label>
+                        <input type="text" name="nama_instansi" class="form-control" value="{{ request.user.nama_instansi|default:'' }}" placeholder="Contoh: Universitas Muhammadiyah Kalimantan Timur">
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Tingkat Pendidikan</label>
+                            <select name="tingkat_pendidikan" class="form-select">
+                                <option value="SMA/SMK" {% if request.user.tingkat_pendidikan == 'SMA/SMK' %}selected{% endif %}>SMA / SMK</option>
+                                <option value="D3" {% if request.user.tingkat_pendidikan == 'D3' %}selected{% endif %}>Diploma (D3)</option>
+                                <option value="S1" {% if request.user.tingkat_pendidikan == 'S1' %}selected{% endif %}>Sarjana (S1)</option>
+                                <option value="S2" {% if request.user.tingkat_pendidikan == 'S2' %}selected{% endif %}>Magister (S2)</option>
+                                <option value="Lainnya" {% if request.user.tingkat_pendidikan == 'Lainnya' %}selected{% endif %}>Lainnya</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Bidang Studi</label>
+                            <input type="text" name="bidang_studi" class="form-control" value="{{ request.user.bidang_studi|default:'' }}" placeholder="Contoh: Teknik Informatika">
+                        </div>
+                    </div>
+                    <button type="submit" class="btn-save-modal mt-2">Simpan Informasi Formal</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal 3: Kata Sandi & Keamanan -->
+<div class="modal fade" id="modalKeamanan" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Kata Sandi & Autentikasi</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4">
+                <form method="POST">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="keamanan">
+
+                    <h6 class="fw-bold mb-3 mt-1" style="color: var(--primary);">Ubah Kata Sandi</h6>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Password Lama</label>
+                        <input type="password" name="old_password" id="old_password" class="form-control" placeholder="Kosongkan jika tidak ingin diubah">
+                    </div>
+
+                    <div class="row mb-2">
+                        <div class="col-6">
+                            <label class="form-label">Password Baru</label>
+                            <input type="password" name="new_password" id="new_password" class="form-control">
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label">Konfirmasi</label>
+                            <input type="password" name="confirm_password" id="confirm_password" class="form-control">
+                        </div>
+                    </div>
+
+                    <!-- Tampilkan Semua Password -->
+                    <div class="form-check mb-4 border-bottom pb-4">
+                        <input class="form-check-input shadow-none" type="checkbox" id="showAllPasswords" onclick="toggleAllPasswords()">
+                        <label class="form-check-label text-muted small fw-semibold" for="showAllPasswords">
+                            Tampilkan semua kata sandi
+                        </label>
+                    </div>
+
+                    <h6 class="fw-bold mb-3" style="color: var(--primary);">Verifikasi Dua Langkah (2FA)</h6>
+                    <div class="form-check form-switch mb-3 d-flex align-items-center ps-0">
+                        <input class="form-check-input mt-0 ms-0 me-2" type="checkbox" name="is_2fa_enabled" id="modalSwitch2fa" {% if request.user.is_2fa_enabled %}checked{% endif %}>
+                        <label class="form-check-label fw-bold" for="modalSwitch2fa">Aktifkan 2FA</label>
+                    </div>
+                    
+                    <!-- Dropdown Metode 2FA -->
+                    <div class="mb-4" id="twoFaMethodWrapper">
+                        <label class="form-label">Metode 2FA</label>
+                        <select name="two_fa_method" class="form-select">
+                            <option value="email" {% if request.user.two_fa_method == 'email' %}selected{% endif %}>OTP via Email</option>
+                            <option value="sms" {% if request.user.two_fa_method == 'sms' %}selected{% endif %}>OTP via SMS</option>
+                            <option value="app" {% if request.user.two_fa_method == 'app' %}selected{% endif %}>Aplikasi Authenticator</option>
+                        </select>
+                    </div>
+
+                    <button type="submit" class="btn-save-modal">Simpan Keamanan</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal 4: Bahasa Antarmuka -->
+<div class="modal fade" id="modalBahasa" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Pilih Bahasa / Select Language</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4">
+                <form action="{% url 'set_language' %}" method="post">
+                    {% csrf_token %}
+                    <input name="next" type="hidden" value="{{ request.get_full_path }}">
+                    
+                    <div class="mb-4">
+                        <select name="language" class="form-select form-select-lg">
+                            {% get_current_language as CURRENT_LANGUAGE %}
+                            {% get_available_languages as AVAILABLE_LANGUAGES %}
+                            
+                            {% for lang_code, lang_name in AVAILABLE_LANGUAGES %}
+                                <option value="{{ lang_code }}" {% if lang_code == CURRENT_LANGUAGE %}selected{% endif %}>
+                                    {{ lang_name }}
+                                </option>
+                            {% endfor %}
+                            
+                        </select>
+                    </div>
+                    <button type="submit" class="btn-save-modal">Simpan Bahasa</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Visibilitas input password pada modal keamanan
+    function toggleAllPasswords() {
+        const checkBox = document.getElementById("showAllPasswords");
+        const oldPw = document.getElementById("old_password");
+        const newPw = document.getElementById("new_password");
+        const confPw = document.getElementById("confirm_password");
+
+        const inputType = checkBox.checked ? "text" : "password";
+        
+        oldPw.type = inputType;
+        newPw.type = inputType;
+        confPw.type = inputType;
+    }
+
+    // Toggle tampilan dropdown metode 2FA
+    document.addEventListener("DOMContentLoaded", function() {
+        const switch2fa = document.getElementById("modalSwitch2fa");
+        const methodWrapper = document.getElementById("twoFaMethodWrapper");
+
+        function check2faStatus() {
+            if (switch2fa.checked) {
+                methodWrapper.style.display = "block";
+            } else {
+                methodWrapper.style.display = "none";
+            }
+        }
+
+        check2faStatus();
+        switch2fa.addEventListener("change", check2faStatus);
+    });
+</script>
+
+{% endblock %}

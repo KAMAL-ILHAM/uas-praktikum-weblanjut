@@ -1,0 +1,660 @@
+{% extends 'base_dashboard.html' %}
+
+{% block title %}Smart Scheduler - EIO Dash{% endblock %}
+
+{% block extra_style %}
+<style>
+    /* ========================================= */
+    /* HEADER & NAVIGASI TAB                     */
+    /* ========================================= */
+    .scheduler-header { 
+        display: flex; 
+        justify-content: space-between; 
+        align-items: center; 
+        margin-bottom: 25px; 
+    }
+    
+    .title-area { 
+        display: flex; 
+        align-items: center; 
+        gap: 15px; 
+    }
+    
+    .icon-box-large { 
+        background: #f5f3ff; 
+        color: var(--primary); 
+        width: 50px; 
+        height: 50px; 
+        border-radius: 14px; 
+        display: flex; 
+        align-items: center; 
+        justify-content: center; 
+        font-size: 1.5rem; 
+    }
+    
+    .scheduler-header h2 { 
+        margin: 0; 
+        font-weight: 800; 
+        color: var(--text-main); 
+        font-size: 1.6rem; 
+    }
+    
+    .actions-area { 
+        display: flex; 
+        gap: 10px; 
+    }
+    
+    .btn-icon { 
+        background: var(--white); 
+        border: 1px solid #e2e8f0; 
+        border-radius: 12px; 
+        width: 45px; 
+        height: 45px; 
+        display: flex; 
+        align-items: center; 
+        justify-content: center; 
+        color: #64748b; 
+        font-size: 1.1rem; 
+        cursor: pointer; 
+        transition: 0.2s; 
+        box-shadow: 0 2px 10px rgba(0,0,0,0.02); 
+    }
+    
+    .btn-icon:hover { 
+        background: #f8fafc; 
+        color: var(--primary); 
+    }
+
+    .custom-tabs { 
+        display: flex; 
+        gap: 30px; 
+        border-bottom: 2px solid #e2e8f0; 
+        padding-bottom: 0; 
+        margin-bottom: 30px; 
+        position: relative; 
+    }
+    
+    .custom-tab-link { 
+        font-size: 1.1rem; 
+        font-weight: 700; 
+        color: #94a3b8; 
+        padding-bottom: 12px; 
+        text-decoration: none; 
+        transition: 0.3s; 
+        position: relative; 
+        display: flex; 
+        align-items: center; 
+        gap: 8px; 
+    }
+    
+    .custom-tab-link:hover { 
+        color: var(--primary); 
+    }
+    
+    .custom-tab-link.active { 
+        color: var(--primary); 
+    }
+    
+    .custom-tab-link.active::after { 
+        content: ''; 
+        position: absolute; 
+        bottom: -2px; 
+        left: 0; 
+        width: 100%; 
+        height: 3px; 
+        background: var(--primary); 
+        border-radius: 3px 3px 0 0; 
+    }
+
+    /* ========================================= */
+    /* LAYOUT GRID UTAMA                         */
+    /* ========================================= */
+    .scheduler-grid { 
+        display: grid; 
+        grid-template-columns: 1fr 400px; 
+        gap: 35px; 
+        align-items: stretch; 
+        padding-bottom: 50px; 
+        animation: fadeIn 0.3s ease-in-out; 
+    }
+    
+    @keyframes fadeIn { 
+        from { opacity: 0; transform: translateY(5px); } 
+        to { opacity: 1; transform: translateY(0); } 
+    }
+
+    /* ========================================= */
+    /* WRAPPER DAFTAR TUGAS (KOLOM KIRI)         */
+    /* ========================================= */
+    .task-list-wrapper { 
+        display: flex; 
+        flex-direction: column; 
+        height: 100%; 
+    }
+    
+    .task-scroll-area { 
+        flex: 1; 
+        overflow-y: auto; 
+        padding-right: 10px; 
+        display: flex; 
+        flex-direction: column; 
+        gap: 15px; 
+        margin-bottom: 15px; 
+        min-height: 400px; 
+    }
+    
+    .task-scroll-area::-webkit-scrollbar { 
+        width: 6px; 
+    }
+    
+    .task-scroll-area::-webkit-scrollbar-track { 
+        background: transparent; 
+    }
+    
+    .task-scroll-area::-webkit-scrollbar-thumb { 
+        background: #cbd5e1; 
+        border-radius: 10px; 
+    }
+
+    .btn-lihat-semua { 
+        background: transparent; 
+        color: var(--primary); 
+        border: 2px dashed #cbd5e1; 
+        border-radius: 16px; 
+        padding: 14px; 
+        font-weight: 800; 
+        font-size: 0.95rem; 
+        cursor: pointer; 
+        transition: 0.2s; 
+        text-align: center; 
+        width: 100%; 
+    }
+    
+    .btn-lihat-semua:hover { 
+        background: #f5f3ff; 
+        border-color: var(--primary); 
+    }
+
+    /* ========================================= */
+    /* KARTU TUGAS DINAMIS                       */
+    /* ========================================= */
+    .task-card { 
+        background: var(--white); 
+        border-radius: 16px; 
+        padding: 20px 25px; 
+        box-shadow: 0 4px 15px rgba(0,0,0,0.02); 
+        border: 1px solid #e2e8f0; 
+        border-left: 6px solid #ccc; 
+        transition: 0.2s; 
+        width: 100%; 
+    }
+    
+    .task-card:hover { 
+        transform: translateX(5px); 
+        box-shadow: 0 8px 25px rgba(0,0,0,0.04); 
+    }
+    
+    /* Indikator Warna Border Kiri */
+    .border-assignment { border-left-color: #db2777 !important; }
+    .border-quiz { border-left-color: #d97706 !important; }
+    .border-project { border-left-color: #4f46e5 !important; }
+
+    /* Indikator Badge Kategori */
+    .badge-tugas { 
+        font-size: 0.7rem; 
+        font-weight: 800; 
+        padding: 6px 12px; 
+        border-radius: 8px; 
+        display: inline-block; 
+        letter-spacing: 0.5px;
+    }
+    
+    .badge-assignment { background: #fce7f3; color: #db2777; } 
+    .badge-quiz { background: #fef3c7; color: #d97706; }       
+    .badge-project { background: #e0e7ff; color: #4f46e5; }    
+    
+    .task-title { 
+        font-size: 1.15rem; 
+        font-weight: 800; 
+        color: var(--text-main); 
+        margin: 0 0 10px 0; 
+    }
+    
+    .task-meta { 
+        font-size: 0.85rem; 
+        color: #64748b; 
+        font-weight: 600; 
+        display: flex; 
+        align-items: center; 
+        gap: 20px; 
+    }
+    
+    .btn-selesai { 
+        background: #ecfdf5; 
+        color: #10b981; 
+        border: none; 
+        border-radius: 10px; 
+        padding: 8px 16px; 
+        font-weight: 800; 
+        font-size: 0.85rem; 
+        display: flex; 
+        align-items: center; 
+        gap: 8px; 
+        cursor: pointer; 
+        transition: 0.2s; 
+    }
+
+    /* ========================================= */
+    /* FORM TAMBAH TUGAS (KOLOM KANAN)           */
+    /* ========================================= */
+    .form-card { 
+        background: var(--white); 
+        border-radius: 20px; 
+        padding: 30px; 
+        box-shadow: 0 10px 40px rgba(0,0,0,0.04); 
+        border: 1px solid #f1f5f9; 
+        height: 100%; 
+        display: flex; 
+        flex-direction: column; 
+    }
+    
+    .form-card-title { 
+        display: flex; 
+        align-items: center; 
+        gap: 10px; 
+        font-size: 1.2rem; 
+        font-weight: 800; 
+        color: var(--text-main); 
+        margin-bottom: 25px; 
+    }
+    
+    .form-card-title i { 
+        color: var(--primary); 
+        font-size: 1.4rem; 
+    }
+    
+    .custom-label { 
+        font-size: 0.85rem; 
+        font-weight: 800; 
+        color: #1e293b; 
+        margin-bottom: 8px; 
+        display: block; 
+    }
+    
+    .custom-input { 
+        width: 100%; 
+        background: #f8fafc; 
+        border: 1px solid #e2e8f0; 
+        border-radius: 12px; 
+        padding: 12px 15px; 
+        font-size: 0.9rem; 
+        color: #475569; 
+        font-weight: 500; 
+        margin-bottom: 20px; 
+        outline: none; 
+        transition: 0.2s; 
+    }
+    
+    .custom-input:focus { 
+        border-color: var(--primary); 
+        background: var(--white); 
+        box-shadow: 0 0 0 3px rgba(99, 60, 245, 0.1); 
+    }
+    
+    /* ========================================= */
+    /* MODAL DETAIL TUGAS                        */
+    /* ========================================= */
+    .modal-overlay { 
+        display: none; 
+        position: fixed; 
+        top: 0; 
+        left: 0; 
+        width: 100%; 
+        height: 100%; 
+        background: rgba(15, 23, 42, 0.6); 
+        z-index: 9999; 
+        justify-content: center; 
+        align-items: center; 
+        backdrop-filter: blur(4px); 
+    }
+    
+    .modal-box { 
+        background: white; 
+        width: 90%; 
+        max-width: 500px; 
+        border-radius: 20px; 
+        padding: 30px; 
+        position: relative; 
+        animation: slideUp 0.3s ease; 
+        box-shadow: 0 20px 50px rgba(0,0,0,0.1); 
+    }
+    
+    @keyframes slideUp { 
+        from { transform: translateY(30px); opacity: 0; } 
+        to { transform: translateY(0); opacity: 1; } 
+    }
+    
+    .modal-close { 
+        position: absolute; 
+        top: 20px; 
+        right: 20px; 
+        background: #f1f5f9; 
+        border: none; 
+        width: 35px; 
+        height: 35px; 
+        border-radius: 50%; 
+        color: #64748b; 
+        cursor: pointer; 
+        transition: 0.2s; 
+    }
+    
+    .modal-close:hover { 
+        background: #fee2e2; 
+        color: #ef4444; 
+    }
+    
+    .month-header { 
+        font-size: 1rem; 
+        font-weight: 800; 
+        color: #94a3b8; 
+        margin: 25px 0 10px 0; 
+        display: flex; 
+        align-items: center; 
+        gap: 8px; 
+        text-transform: uppercase; 
+        letter-spacing: 1px; 
+    }
+
+    /* ========================================= */
+    /* ZONA UPLOAD GAMBAR                        */
+    /* ========================================= */
+    .upload-zone { 
+        border: 2px dashed #cbd5e1; 
+        border-radius: 14px; 
+        padding: 25px; 
+        text-align: center; 
+        cursor: pointer; 
+        transition: 0.2s; 
+        margin-bottom: 25px; 
+        background: #f8fafc; 
+        position: relative; 
+    }
+    
+    .upload-zone:hover { 
+        border-color: var(--primary); 
+        background: #f5f3ff; 
+    }
+    
+    .upload-zone.has-file { 
+        border-color: var(--primary); 
+        background: #f5f3ff; 
+        border-style: solid; 
+    }
+    
+    .upload-zone i { 
+        font-size: 2rem; 
+        color: #64748b; 
+        margin-bottom: 10px; 
+    }
+    
+    .upload-zone h6 { 
+        margin: 0 0 5px 0; 
+        font-weight: 700; 
+        color: var(--text-main); 
+        font-size: 0.95rem; 
+    }
+    
+    .upload-zone p { 
+        margin: 0; 
+        font-size: 0.75rem; 
+        color: #94a3b8; 
+        font-weight: 600; 
+    }
+    
+    .btn-submit-task { 
+        width: 100%; 
+        background: var(--primary); 
+        color: white; 
+        border: none; 
+        border-radius: 12px; 
+        padding: 14px; 
+        font-weight: 800; 
+        font-size: 0.95rem; 
+        cursor: pointer; 
+        transition: 0.2s; 
+        box-shadow: 0 8px 20px rgba(99, 60, 245, 0.25); 
+        margin-top: auto; 
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="scheduler-header">
+    <div class="title-area">
+        <div class="icon-box-large"><i class="fa-solid fa-calendar-check"></i></div>
+        <h2>Smart Scheduler</h2>
+    </div>
+    <div class="actions-area">
+        <button class="btn-icon"><i class="fa-solid fa-magnifying-glass"></i></button>
+        <button class="btn-icon"><i class="fa-regular fa-bell"></i></button>
+    </div>
+</div>
+
+<div class="custom-tabs">
+    <a href="{% url 'tasks:task_list' %}" class="custom-tab-link active">Tugas Aktif</a>
+    <a href="{% url 'tasks:task_calendar' %}" class="custom-tab-link">
+        Arsip Tugas <i class="fa-solid fa-lock" style="font-size: 0.8rem;"></i>
+    </a>
+</div>
+
+<div class="scheduler-grid">
+    
+    <!-- Bagian Kiri: Daftar Tugas -->
+    <div class="task-list-wrapper">
+        <div class="task-scroll-area">
+            {% regroup tugas_aktif by tenggat_waktu|date:"F Y" as tugas_per_bulan %}
+            
+            {% for bulan in tugas_per_bulan %}
+                <div class="month-header">
+                    <i class="fa-regular fa-calendar-days"></i> {{ bulan.grouper }}
+                </div>
+                
+                {% for tugas in bulan.list %}
+                <div class="task-card 
+                    {% if tugas.tingkat_kesulitan == 'Sulit' %}border-project
+                    {% elif tugas.tingkat_kesulitan == 'Sedang' %}border-quiz
+                    {% else %}border-assignment{% endif %}">
+                    
+                    <div style="width: 100%;">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            
+                            <span class="badge-tugas mb-0
+                                {% if tugas.tingkat_kesulitan == 'Sulit' %}badge-project
+                                {% elif tugas.tingkat_kesulitan == 'Sedang' %}badge-quiz
+                                {% else %}badge-assignment{% endif %}">
+                                {% if tugas.tingkat_kesulitan == 'Sulit' %}Project
+                                {% elif tugas.tingkat_kesulitan == 'Sedang' %}Quiz
+                                {% else %}Assignment{% endif %}
+                            </span>
+                            
+                            <button class="btn-selesai btn-detail-trigger" 
+                                style="background: #f1f5f9; color: var(--primary);" 
+                                data-id="{{ tugas.id }}"
+                                data-judul="{{ tugas.nama_tugas }}"
+                                data-deadline="{{ tugas.tenggat_waktu|date:'d M Y, H:i' }}"
+                                data-jenis="{% if tugas.tingkat_kesulitan == 'Sulit' %}Project{% elif tugas.tingkat_kesulitan == 'Sedang' %}Quiz{% else %}Assignment{% endif %}"
+                                data-warna="{% if tugas.tingkat_kesulitan == 'Sulit' %}badge-project{% elif tugas.tingkat_kesulitan == 'Sedang' %}badge-quiz{% else %}badge-assignment{% endif %}"
+                                data-catatan="{{ tugas.catatan|default:'Tidak ada catatan tambahan.' }}"
+                                data-gambar="{% if tugas.lampiran_gambar %}{{ tugas.lampiran_gambar.url }}{% endif %}">
+                                Detail <i class="fa-solid fa-expand"></i>
+                            </button>
+                        </div>
+                        <h4 class="task-title">{{ tugas.nama_tugas }}</h4>
+                        <div class="task-meta">
+                            <span><i class="fa-regular fa-clock text-warning"></i> {{ tugas.tenggat_waktu|date:"d M Y, H:i" }}</span>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+                
+            {% empty %}
+                <div style="flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center;">
+                    <i class="fa-regular fa-face-smile-wink" style="font-size: 3rem; color: #cbd5e1; margin-bottom: 15px;"></i>
+                    <h5 style="color: #64748b; font-weight: 700; margin: 0;">Kosong! Waktunya bersantai.</h5>
+                </div>
+            {% endfor %}
+        </div>
+        
+        <button class="btn-lihat-semua">
+            Lihat Semua Tugas ({{ total_tugas }}) <i class="fa-solid fa-chevron-down ms-2"></i>
+        </button>
+    </div>
+
+    <!-- Bagian Kanan: Form Tambah Tugas -->
+    <div class="form-card">
+        <div class="form-card-title">
+            <i class="fa-solid fa-circle-plus"></i> Tambah Tugas Baru
+        </div>
+        
+        <form action="" method="POST" enctype="multipart/form-data" style="display: flex; flex-direction: column; height: 100%;">
+            {% csrf_token %}
+            <div>
+                <label class="custom-label">Nama Tugas</label>
+                <input type="text" class="custom-input" name="nama_tugas" placeholder="Contoh: Laporan Ubuntu Kelompok 11" required>
+                
+                <label class="custom-label">Tenggat Waktu (Deadline)</label>
+                <input type="datetime-local" class="custom-input" name="deadline" required>
+                
+                <label class="custom-label">Jenis Tugas</label>
+                <select class="custom-input" name="kesulitan" style="appearance: auto;">
+                    <option value="Sedang">Quiz</option>
+                    <option value="Mudah">Assignment</option>
+                    <option value="Sulit">Project</option>
+                </select>
+                
+                <label class="custom-label">Soal / Catatan (Opsional)</label>
+                <textarea class="custom-input" name="catatan" rows="3" placeholder="Ketik deskripsi tugas di sini..." style="resize: none;"></textarea>
+                
+                <div class="upload-zone" id="drop-zone" onclick="document.getElementById('task_image').click()">
+                    <input type="file" id="task_image" name="task_image" accept="image/png, image/jpeg, image/jpg" style="display: none;" onchange="handleFileSelect(this)">
+                    
+                    <div id="upload-default">
+                        <i class="fa-regular fa-image" style="display: block; margin-bottom: 10px; color: #64748b; font-size: 2rem;"></i>
+                        <h6>Lampirkan Gambar Soal</h6>
+                        <p>Format JPG, PNG (Maks 5MB)</p>
+                    </div>
+                    
+                    <div id="upload-success" style="display: none;">
+                        <i class="fa-solid fa-file-circle-check text-primary" style="font-size: 2rem; margin-bottom: 10px;"></i>
+                        <h6 id="file-name" class="text-primary mb-1">NamaFile.jpg</h6>
+                        <span class="text-danger" onclick="event.stopPropagation(); removeFile();" style="font-size: 0.8rem; font-weight: 700; cursor: pointer;">Batalkan File</span>
+                    </div>
+                </div>
+            </div>
+            
+            <button type="submit" class="btn-submit-task">Tambahkan tugas</button>
+        </form>
+    </div>
+</div>
+
+<!-- Modal Detail Tugas -->
+<div class="modal-overlay" id="detailModal">
+    <div class="modal-box">
+        <button class="modal-close" onclick="tutupModal()"><i class="fa-solid fa-xmark"></i></button>
+        
+        <span class="badge-tugas mb-3" id="modal-badge">Jenis Tugas</span>
+        <h3 id="modal-judul" style="font-weight: 800; color: #1e293b; margin-bottom: 15px;">Judul Tugas</h3>
+        
+        <div style="background: #f8fafc; padding: 15px; border-radius: 12px; margin-bottom: 20px;">
+            <div style="font-size: 0.85rem; color: #64748b; font-weight: 700; margin-bottom: 5px;">DEADLINE:</div>
+            <div id="modal-deadline" style="font-weight: 800; color: #ef4444;"><i class="fa-regular fa-clock"></i> -</div>
+        </div>
+
+        <div style="font-size: 0.85rem; color: #64748b; font-weight: 700; margin-bottom: 8px;">CATATAN TUGAS:</div>
+        <p id="modal-catatan" style="color: #475569; font-size: 0.95rem; line-height: 1.6; max-height: 100px; overflow-y: auto;"></p>
+        
+        <div id="modal-gambar-container" style="display: none; margin-top: 15px;">
+            <img id="modal-gambar" src="" alt="Lampiran Tugas" style="width: 100%; max-height: 200px; object-fit: cover; border-radius: 12px; border: 1px solid #e2e8f0; cursor: pointer;" onclick="window.open(this.src, '_blank')">
+        </div>
+        
+        <div style="display: flex; gap: 10px; margin-top: 25px;">
+            <button class="btn-submit-task" style="flex: 1; margin-top: 0; background: #f1f5f9; color: #64748b; box-shadow: none;" onclick="tutupModal()">Tutup</button>
+            
+            <form id="form-selesai-tugas" method="POST" action="" style="flex: 1; display: flex;">
+                {% csrf_token %}
+                <button type="submit" class="btn-selesai" style="width: 100%; justify-content: center; font-size: 0.95rem;">Tandai Selesai <i class="fa-solid fa-check"></i></button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Handle File Upload Preview
+    function handleFileSelect(input) {
+        const file = input.files[0];
+        if (file) {
+            document.getElementById('upload-default').style.display = 'none';
+            document.getElementById('upload-success').style.display = 'block';
+            document.getElementById('file-name').textContent = file.name;
+            document.getElementById('drop-zone').classList.add('has-file');
+        }
+    }
+
+    // Handle File Removal
+    function removeFile() {
+        document.getElementById('task_image').value = '';
+        document.getElementById('upload-success').style.display = 'none';
+        document.getElementById('upload-default').style.display = 'block';
+        document.getElementById('drop-zone').classList.remove('has-file');
+    }
+
+    // Bind Event Listeners for Task Detail Triggers
+    document.addEventListener('DOMContentLoaded', function() {
+        const detailButtons = document.querySelectorAll('.btn-detail-trigger');
+        
+        detailButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                // Extract data attributes
+                const id = this.getAttribute('data-id');
+                const judul = this.getAttribute('data-judul');
+                const deadline = this.getAttribute('data-deadline');
+                const jenis = this.getAttribute('data-jenis');
+                const warna = this.getAttribute('data-warna');
+                const catatan = this.getAttribute('data-catatan');
+                const gambar = this.getAttribute('data-gambar');
+                
+                // Populate Modal Content
+                document.getElementById('modal-judul').innerText = judul;
+                document.getElementById('modal-deadline').innerHTML = '<i class="fa-regular fa-clock"></i> ' + deadline;
+                document.getElementById('modal-catatan').innerText = catatan;
+                
+                // Configure Task Type Badge
+                const badge = document.getElementById('modal-badge');
+                badge.innerText = jenis;
+                badge.className = `badge-tugas mb-3 ${warna}`;
+
+                // Process Attached Image Display
+                const imgContainer = document.getElementById('modal-gambar-container');
+                const imgTag = document.getElementById('modal-gambar');
+                if (gambar) {
+                    imgTag.src = gambar;
+                    imgContainer.style.display = 'block';
+                } else {
+                    imgContainer.style.display = 'none';
+                }
+
+                // Configure Form Action Endpoint
+                document.getElementById('form-selesai-tugas').action = `/tasks/selesai/${id}/`;
+
+                // Display Modal
+                document.getElementById('detailModal').style.display = 'flex';
+            });
+        });
+    });
+
+    // Close Modal Function
+    function tutupModal() {
+        document.getElementById('detailModal').style.display = 'none';
+    }
+</script>
+{% endblock %}
