@@ -59,6 +59,7 @@ class CustomUser(AbstractUser):
     two_fa_method = models.CharField(max_length=10, choices=TWO_FA_METHODS, default='email')
     is_biometric_enabled = models.BooleanField(default=False)
     notifikasi_aktif = models.BooleanField(default=True)
+    is_pengingat_aktif = models.BooleanField(default=True)
 
     def __str__(self):
         instansi = self.nama_instansi if self.nama_instansi else "Instansi Belum Diisi"

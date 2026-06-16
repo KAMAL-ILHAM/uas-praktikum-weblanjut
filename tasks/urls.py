@@ -12,4 +12,7 @@ urlpatterns = [
 
     # Aksi Status Tugas
     path('selesai/<int:tugas_id>/', views.tandai_selesai, name='tandai_selesai'),
+
+    # Jalur khusus untuk tombol pengingat 1 jam
+    path('pengingat-1-jam/<int:tugas_id>/', views.set_pengingat_satu_jam, name='set_pengingat_1_jam'),
 ]

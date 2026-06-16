@@ -96,6 +96,12 @@
             font-size: 1rem;
         }
 
+        .custom-alert.success {
+            background-color: #ecfdf5 !important;
+            border-left: 4px solid #10b981 !important;
+            color: #065f46 !important;
+        }
+
         /* Form Inputs */
         .form-label {
             font-size: 0.85rem;
@@ -200,15 +206,15 @@
                     <div class="top-icon">
                         <i class="bi bi-mortarboard-fill"></i>
                     </div>
-                    <h3 class="fw-bold mb-1">Selamat Datang 👋</h3>
+                    <h3 class="fw-bold mb-1">Selamat Datang</h3>
                     <p class="text-small">Silakan masukkan kredensial akun kamu untuk melanjutkan belajar.</p>
                 </div>
 
-                <!-- Django Alert Messages -->
                 {% if messages %}
                     {% for message in messages %}
-                        <div class="custom-alert">
-                            <i class="bi bi-exclamation-circle-fill"></i> {{ message }}
+                        <div class="custom-alert {% if 'success' in message.tags %}success{% endif %}">
+                            <i class="bi {% if 'success' in message.tags %}bi-check-circle-fill{% else %}bi-exclamation-circle-fill{% endif %}"></i> 
+                            {{ message }}
                         </div>
                     {% endfor %}
                 {% endif %}

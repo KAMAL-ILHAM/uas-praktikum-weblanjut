@@ -71,3 +71,29 @@ def tandai_selesai(request, tugas_id):
         messages.success(request, f"Mantap! Tugas '{tugas.nama_tugas}' telah diselesaikan.")
         
     return redirect('tasks:task_list')
+
+def set_pengingat_view(request, tugas_id):
+    tugas = Tugas.objects.get(id=tugas_id)
+    
+    # Ambil waktu detik ini, lalu tambah 1 jam (hours=1)
+    waktu_sekarang = timezone.now()
+    tugas.waktu_pengingat = waktu_sekarang + timedelta(seconds=10)
+    tugas.is_pengingat_terkirim = False # Reset statusnya
+    
+    tugas.save()
+    messages.success(request, 'Pengingat berhasil disetel untuk 1 jam ke depan!')
+    return redirect('users:dashboard')
+
+def set_pengingat_satu_jam(request, tugas_id):
+    # Mengambil data tugas berdasarkan ID dan User aktif
+    tugas = Tugas.objects.get(id=tugas_id, user=request.user)
+    
+    # Set waktu pengingat 1 jam dari detik ini
+    tugas.waktu_pengingat = timezone.now() + timedelta(seconds=10)
+    tugas.is_pengingat_terkirim = False
+    tugas.save()
+    
+    # Menggunakan nama_tugas sesuai struktur model terbaru
+    messages.success(request, f'Pengingat untuk "{tugas.nama_tugas}" berhasil disetel 1 jam dari sekarang!')
+    
+    return redirect('users:dashboard')

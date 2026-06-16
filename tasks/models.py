@@ -27,6 +27,9 @@ class Tugas(models.Model):
     # Timestamps
     created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
 
+    waktu_pengingat = models.DateTimeField(null=True, blank=True)
+    is_pengingat_terkirim = models.BooleanField(default=False)
+
     def __str__(self):
         status = "Selesai" if self.is_selesai else "Aktif"
         return f"[{status}] {self.nama_tugas} - {self.user.username}"

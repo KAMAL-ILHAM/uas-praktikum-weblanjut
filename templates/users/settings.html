@@ -239,18 +239,6 @@
     </div>
 </div>
 
-<!-- Alert Messages -->
-{% if messages %}
-    <div class="mb-4">
-        {% for message in messages %}
-            <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} alert-dismissible fade show shadow-sm" style="border-radius: 12px;" role="alert">
-                {{ message }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-        {% endfor %}
-    </div>
-{% endif %}
-
 <!-- Kartu Profil -->
 <div class="profile-desktop-card">
     <div class="profile-cover"></div>
@@ -290,16 +278,6 @@
                     <div class="setting-text">Kata Sandi & Autentikasi</div>
                     <div class="setting-chevron"><i class="fa-solid fa-angle-right"></i></div>
                 </a>
-                <a href="#" class="setting-item">
-                    <div class="icon-box bg-green"><i class="fa-solid fa-fingerprint"></i></div>
-                    <div class="setting-text">Kunci Biometrik (Passkey)</div>
-                    <div class="setting-chevron"><i class="fa-solid fa-angle-right"></i></div>
-                </a>
-                <a href="#" class="setting-item">
-                    <div class="icon-box bg-gray"><i class="fa-solid fa-laptop"></i></div>
-                    <div class="setting-text">Sesi Perangkat Aktif</div>
-                    <div class="setting-chevron"><i class="fa-solid fa-angle-right"></i></div>
-                </a>
             </div>
         </div>
 
@@ -307,13 +285,20 @@
         <div class="settings-section">
             <div class="section-title">Preferensi Aplikasi</div>
             <div class="settings-card">
-                <div class="setting-item">
-                    <div class="icon-box bg-purple"><i class="fa-solid fa-bell"></i></div>
-                    <div class="setting-text">Notifikasi & Pengingat Tugas</div>
-                    <div class="form-check form-switch">
-                        <input class="form-check-input" type="checkbox" checked>
+                <form method="POST" class="m-0 p-0">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="toggle_notif">
+                    
+                    <div class="setting-item">
+                        <div class="icon-box bg-purple"><i class="fa-solid fa-bell"></i></div>
+                        <div class="setting-text">Notifikasi & Pengingat Tugas</div>
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" name="status_notif" 
+                                onchange="this.form.submit()" 
+                                {% if request.user.is_pengingat_aktif %}checked{% endif %}>
+                        </div>
                     </div>
-                </div>
+                </form>
                 <a href="#" class="setting-item active-state" data-bs-toggle="modal" data-bs-target="#modalBahasa">
                     <div class="icon-box bg-blue"><i class="fa-solid fa-language"></i></div>
                     <div class="setting-text">Bahasa Antarmuka</div>
@@ -323,13 +308,6 @@
                     </span>
                     <div class="setting-chevron"><i class="fa-solid fa-angle-right"></i></div>
                 </a>
-                <div class="setting-item">
-                    <div class="icon-box bg-orange"><i class="fa-solid fa-moon"></i></div>
-                    <div class="setting-text">Mode Gelap (Dark Mode)</div>
-                    <div class="form-check form-switch">
-                        <input class="form-check-input" type="checkbox">
-                    </div>
-                </div>
             </div>
         </div>
     </div>
@@ -340,12 +318,12 @@
         <div class="settings-section">
             <div class="section-title">Dukungan & Lainnya</div>
             <div class="settings-card">
-                <a href="#" class="setting-item">
+                <a class="setting-item" style="cursor: pointer;" data-bs-toggle="modal" data-bs-target="#modalFAQ">
                     <div class="icon-box bg-blue"><i class="fa-solid fa-circle-info"></i></div>
                     <div class="setting-text">Pusat Bantuan & FAQ</div>
                     <div class="setting-chevron"><i class="fa-solid fa-angle-right"></i></div>
                 </a>
-                <a href="{% url 'users:logout' %}" class="setting-item">
+               <a href="#" onclick="event.preventDefault(); bukaModalLogout();" class="setting-item">
                     <div class="icon-box bg-red"><i class="fa-solid fa-right-from-bracket"></i></div>
                     <div class="setting-text" style="color: #ef4444;">Keluar Akun</div>
                 </a>
@@ -547,6 +525,88 @@
     </div>
 </div>
 
+<!-- Modal 5: Pusat Bantuan & FAQ -->
+<div class="modal fade" id="modalFAQ" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Pusat Bantuan & FAQ</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4">
+                
+                <!-- Accordion Bootstrap untuk FAQ -->
+                <div class="accordion" id="accordionFAQ">
+                    
+                    <!-- Pertanyaan 1 -->
+                    <div class="accordion-item border-0 mb-3 shadow-sm" style="border-radius: 12px; overflow: hidden;">
+                        <h2 class="accordion-header" id="headingOne">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne" style="font-weight: 700; background-color: #f8fafc; color: #1e293b;">
+                                Bagaimana cara mengubah kata sandi?
+                            </button>
+                        </h2>
+                        <div id="collapseOne" class="accordion-collapse collapse" aria-labelledby="headingOne" data-bs-parent="#accordionFAQ">
+                            <div class="accordion-body text-muted" style="font-size: 0.9rem;">
+                                Anda dapat mengubah kata sandi melalui menu <strong>Pengaturan > Kata Sandi & Autentikasi</strong>. Masukkan kata sandi lama Anda lalu ketikkan kata sandi baru.
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Pertanyaan 2 -->
+                    <div class="accordion-item border-0 mb-3 shadow-sm" style="border-radius: 12px; overflow: hidden;">
+                        <h2 class="accordion-header" id="headingTwo">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo" style="font-weight: 700; background-color: #f8fafc; color: #1e293b;">
+                                Apa itu Verifikasi Dua Langkah (2FA)?
+                            </button>
+                        </h2>
+                        <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#accordionFAQ">
+                            <div class="accordion-body text-muted" style="font-size: 0.9rem;">
+                                2FA adalah lapisan keamanan tambahan. Saat login, selain menggunakan password, Anda juga akan diminta memasukkan kode unik (OTP) yang dikirim ke Email atau Aplikasi Anda.
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Pertanyaan 3 -->
+                    <div class="accordion-item border-0 mb-2 shadow-sm" style="border-radius: 12px; overflow: hidden;">
+                        <h2 class="accordion-header" id="headingThree">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree" style="font-weight: 700; background-color: #f8fafc; color: #1e293b;">
+                                Saya lupa email akun saya, apa yang harus dilakukan?
+                            </button>
+                        </h2>
+                        <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#accordionFAQ">
+                            <div class="accordion-body text-muted" style="font-size: 0.9rem;">
+                                Silakan hubungi tim dukungan kami melalui email di <strong>support@eiomaster.com</strong> dengan melampirkan username atau nomor induk Anda agar kami dapat membantu memulihkan akun.
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+            <div class="modal-footer border-0 p-4 pt-0">
+                <button type="button" class="btn btn-secondary w-100" data-bs-dismiss="modal" style="border-radius: 8px; font-weight: 700; background-color: #e2e8f0; color: #475569; border: none;">Tutup</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="modalLogout">
+    <div class="modal-box">
+        <h4 style="font-weight: 800; color: var(--text-main); margin-bottom: 10px;">Keluar Akun</h4>
+        <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 25px;">
+            Apakah Anda yakin ingin keluar dari akun EIO Master?
+        </p>
+        <div class="d-flex gap-3">
+            <button onclick="tutupModalLogout()" style="flex: 1; padding: 12px; border: none; border-radius: 12px; background: var(--border-color); color: var(--text-main); font-weight: 700; cursor: pointer;">
+                Tidak
+            </button>
+            <a href="{% url 'users:logout' %}" style="flex: 1; padding: 12px; border: none; border-radius: 12px; background: #ef4444; color: white; font-weight: 700; text-decoration: none; text-align: center;">
+                Ya, Keluar
+            </a>
+        </div>
+    </div>
+</div>
+
 <script>
     // Visibilitas input password pada modal keamanan
     function toggleAllPasswords() {
@@ -578,6 +638,13 @@
         check2faStatus();
         switch2fa.addEventListener("change", check2faStatus);
     });
+
+    function bukaModalLogout() {
+        document.getElementById('modalLogout').style.display = 'flex';
+    }
+    function tutupModalLogout() {
+        document.getElementById('modalLogout').style.display = 'none';
+    }
 </script>
 
 {% endblock %}

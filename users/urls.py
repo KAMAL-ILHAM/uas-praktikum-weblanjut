@@ -7,6 +7,7 @@ app_name = 'users'
 urlpatterns = [
     # Autentikasi Dasar
     path('login/', views.login_view, name='login'),
+    path('verify-otp/', views.verify_otp_view, name='verify_otp'),
     path('register/', views.register_view, name='register'),
     path('logout/', views.logout_view, name='logout'),
     

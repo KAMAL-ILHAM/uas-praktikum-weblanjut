@@ -147,3 +147,10 @@ DEFAULT_FROM_EMAIL = 'noreply@eiomaster.com'
 LOGIN_URL = 'users:login'
 
 GROQ_API_KEY = os.getenv('GROQ_API_KEY')
+
+
+LANGUAGE_CODE = 'id'         
+TIME_ZONE = 'Asia/Makassar' 
+
+USE_I18N = True
+USE_TZ = True
