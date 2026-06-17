@@ -4,7 +4,9 @@
 
 {% block extra_style %}
 <style>
-    /* Navigasi Kembali */
+    /* ========================================= */
+    /* NAVIGASI & HEADER                         */
+    /* ========================================= */
     .back-link { 
         display: flex; 
         align-items: center; 
@@ -27,9 +29,14 @@
         justify-content: center; 
         color: var(--text-main); 
         font-size: 0.9rem;
+        transition: 0.2s;
+    }
+
+    .back-link:hover .back-btn {
+        background: #f1f5f9;
+        transform: translateX(-3px);
     }
     
-    /* Banner Detail Dokumen */
     .detail-banner { 
         background: var(--primary); 
         border-radius: 20px; 
@@ -42,12 +49,14 @@
     .detail-banner h2 { 
         font-weight: 800; 
         font-size: 1.8rem; 
-        margin: 0 0 15px 0; 
+        margin: 0 0 15px 0;
+        word-break: break-word;
     }
     
     .badge-container { 
         display: flex; 
         gap: 15px; 
+        flex-wrap: wrap; /* Mencegah badge terpotong di layar kecil */
     }
     
     .badge-pill { 
@@ -62,7 +71,9 @@
         gap: 8px; 
     }
 
-    /* Alert Sukses Custom */
+    /* ========================================= */
+    /* ALERT & LAYOUT UTAMA                      */
+    /* ========================================= */
     .alert-success-custom { 
         background: #ecfdf5; 
         border: 1px solid #a7f3d0; 
@@ -90,7 +101,6 @@
         flex-shrink: 0; 
     }
 
-    /* Layout Konten Utama */
     .content-grid { 
         display: grid; 
         grid-template-columns: 1fr 380px; 
@@ -99,53 +109,9 @@
         padding-bottom: 50px; 
     }
 
-    /* Styling Teks & Tabel AI (Markdown Output) */
-    .modal-body {
-        padding: 40px;
-        color: #2c3e50;
-        line-height: 1.6;
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        background-color: #fff;
-    }
-
-    .modal-body table {
-        width: 100%;
-        border-collapse: collapse;
-        margin: 25px 0;
-        font-size: 0.95rem;
-        border: 1px solid #d1d5db; 
-    }
-
-    .modal-body th {
-        background-color: #f3f4f6; 
-        color: #111827;
-        font-weight: 600;
-        text-align: left;
-        padding: 12px;
-        border: 1px solid #d1d5db; 
-    }
-
-    .modal-body td {
-        padding: 10px 12px;
-        border: 1px solid #d1d5db; 
-        vertical-align: top;
-    }
-
-    .modal-body ul, 
-    .modal-body ol {
-        margin-bottom: 20px;
-        padding-left: 25px;
-    }
-
-    .modal-body li {
-        margin-bottom: 8px;
-    }
-
-    .modal-body p {
-        margin-bottom: 1.5rem;
-    }
-
-    /* Kartu Ringkasan */
+    /* ========================================= */
+    /* KARTU RANGKUMAN                           */
+    /* ========================================= */
     .summary-card { 
         background: var(--white); 
         border-radius: 16px; 
@@ -164,23 +130,6 @@
         margin: 0 0 15px 0; 
     }
 
-    /* Override Modal Body (Menyesuaikan Cascade CSS Sebelumnya) */
-    .modal-body { 
-        padding: 30px; 
-        overflow-y: auto; 
-        color: #334155; 
-        line-height: 1.6; 
-        font-size: 1rem; 
-        text-align: left; 
-        white-space: pre-wrap; 
-        font-family: 'Inter', sans-serif; 
-    }
-
-    /* Penanganan Font Monospace untuk Format Tabel Khusus */
-    .modal-body:contains("|") {
-        font-family: 'Courier New', Courier, monospace; 
-    }
-
     .summary-text { 
         color: #334155; 
         line-height: 1.6; 
@@ -188,11 +137,11 @@
         text-align: justify;
         white-space: pre-wrap;
         display: -webkit-box;
-        display: box;
         line-clamp: 10;
         -webkit-line-clamp: 10;
         -webkit-box-orient: vertical;
         overflow: hidden;
+        margin-bottom: 15px;
     }
     
     .btn-read-more { 
@@ -209,13 +158,16 @@
         align-items: center; 
         gap: 8px; 
         align-self: flex-start; 
+        margin-top: auto;
     }
     
     .btn-read-more:hover { 
         background: #f1f5f9; 
     }
 
-    /* Kartu Quiz / Latihan */
+    /* ========================================= */
+    /* KARTU QUIZ / LATIHAN                      */
+    /* ========================================= */
     .quiz-card { 
         background: var(--white); 
         border-radius: 16px; 
@@ -287,7 +239,9 @@
         box-shadow: 0 12px 25px rgba(16, 185, 129, 0.35); 
     }
 
-    /* Modal Styling */
+    /* ========================================= */
+    /* MODAL STYLING & MARKDOWN OUTPUT           */
+    /* ========================================= */
     .modal-overlay { 
         position: fixed; 
         top: 0; 
@@ -353,16 +307,107 @@
         cursor: pointer; 
         transition: 0.2s; 
     }
+
+    .btn-close-modal:hover {
+        background: #e2e8f0;
+        color: #0f172a;
+    }
     
-    /* Override Final untuk Modal Body */
     .modal-body { 
         padding: 30px; 
         overflow-y: auto; 
         color: #334155; 
-        line-height: 1.8; 
+        line-height: 1.6; 
         font-size: 1rem; 
-        text-align: justify; 
-        white-space: pre-line; 
+        text-align: left; 
+        white-space: pre-wrap; 
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+    }
+
+    /* Penanganan Font Monospace untuk Format Tabel Khusus */
+    .modal-body:contains("|") {
+        font-family: 'Courier New', Courier, monospace; 
+    }
+
+    .modal-body table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 25px 0;
+        font-size: 0.95rem;
+        border: 1px solid #d1d5db; 
+    }
+
+    .modal-body th {
+        background-color: #f3f4f6; 
+        color: #111827;
+        font-weight: 600;
+        text-align: left;
+        padding: 12px;
+        border: 1px solid #d1d5db; 
+    }
+
+    .modal-body td {
+        padding: 10px 12px;
+        border: 1px solid #d1d5db; 
+        vertical-align: top;
+    }
+
+    .modal-body ul, 
+    .modal-body ol {
+        margin-bottom: 20px;
+        padding-left: 25px;
+    }
+
+    .modal-body li {
+        margin-bottom: 8px;
+    }
+
+    .modal-body p {
+        margin-bottom: 1.5rem;
+    }
+
+    /* ========================================= */
+    /* MEDIA QUERIES (UNTUK RESPONSIVITAS)       */
+    /* ========================================= */
+    @media (max-width: 992px) {
+        .content-grid {
+            grid-template-columns: 1fr; /* Mengubah layout menjadi satu kolom ke bawah pada tablet/layar sedang */
+        }
+    }
+
+    @media (max-width: 768px) {
+        .detail-banner {
+            padding: 25px;
+        }
+
+        .detail-banner h2 {
+            font-size: 1.4rem;
+        }
+
+        .summary-card, .quiz-card {
+            padding: 20px;
+        }
+
+        .modal-header, .modal-body {
+            padding: 20px;
+        }
+
+        .modal-header h3 {
+            font-size: 1.1rem;
+        }
+
+        .back-link {
+            font-size: 1rem;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .badge-pill {
+            font-size: 0.75rem;
+            padding: 6px 12px;
+            width: 100%; /* Badge memenuhi lebar pada HP yang sangat kecil */
+            justify-content: center;
+        }
     }
 </style>
 {% endblock %}
@@ -396,7 +441,6 @@
 {% endif %}
 
 <div class="content-grid">
-    <!-- Kartu Rangkuman -->
     <div class="summary-card">
         <h4 class="summary-title">Rangkuman Cerdas AI</h4>
         <p class="summary-text">
@@ -407,7 +451,6 @@
         </button>
     </div>
 
-    <!-- Kartu Generator Latihan/Quiz -->
     <div class="quiz-card">
         <h3 class="quiz-title">Uji Pemahamanmu! 🎯</h3>
         <p class="quiz-desc">Pilih format latihan yang sesuai dengan gaya belajarmu berdasarkan materi yang telah diolah.</p>
@@ -421,7 +464,7 @@
     
             <label class="custom-label">Format Latihan</label>
             <select name="format_latihan" class="custom-input" style="appearance: auto;">
-                <option value="pilihan_ganda">Pilihan Ganda )</option>
+                <option value="pilihan_ganda">Pilihan Ganda</option>
                 <option value="flashcard">Flashcard Pintar</option>
                 <option value="essay">Essay / Uraian</option>
             </select>
@@ -433,7 +476,6 @@
     </div>
 </div>
 
-<!-- Modal Rangkuman Lengkap -->
 <div class="modal-overlay" id="summaryModal">
     <div class="modal-content">
         <div class="modal-header">

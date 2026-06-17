@@ -1,4 +1,4 @@
-import random 
+import random
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout, get_user_model, update_session_auth_hash
 from django.contrib import messages
@@ -6,15 +6,15 @@ from django.contrib.auth.decorators import login_required
 from django.core.mail import send_mail
 from django.utils.html import strip_tags
 
-from documents.models import DokumenMateri   
-from tasks.models import Tugas               
+from documents.models import DokumenMateri
+from tasks.models import Tugas
 
 # Inisialisasi Custom User Model
 User = get_user_model()
 
 def login_view(request):
     if request.user.is_authenticated:
-        return redirect('users:dashboard') 
+        return redirect('users:dashboard')
 
     if request.method == 'POST':
         usr = request.POST.get('username')
@@ -27,14 +27,14 @@ def login_view(request):
             if user.is_2fa_enabled and user.two_fa_method == 'email':
                 # 1. Generate 6 digit angka acak
                 otp_code = str(random.randint(100000, 999999))
-                
+
                 # 2. Simpan OTP dan ID user di session sementara
                 request.session['pending_user_id'] = user.id
                 request.session['2fa_otp'] = otp_code
-                
+
                 # 3. Kirim email HTML via Mailtrap
                 subject = 'Kode Keamanan (OTP) Login - EIO Master'
-                
+
                 # === KODE HTML UNTUK EMAIL OTP ===
                 html_message = f"""
                 <!DOCTYPE html>
@@ -61,11 +61,11 @@ def login_view(request):
                             <h3 style="margin-top: 0; color: #1e293b; font-size: 20px;">Verifikasi Login Anda</h3>
                             <p>Halo, <strong>{user.username}</strong>!</p>
                             <p>Kami mendeteksi percobaan login ke akun Anda. Silakan masukkan 6 digit kode keamanan (OTP) di bawah ini untuk melanjutkan:</p>
-                            
+
                             <div class="otp-box">
                                 <p class="otp-code">{otp_code}</p>
                             </div>
-                            
+
                             <div class="warning-text">
                                 ⚠️ PENTING: Kode ini bersifat rahasia. Jangan berikan kepada siapapun!
                             </div>
@@ -78,10 +78,10 @@ def login_view(request):
                 </body>
                 </html>
                 """
-                
+
                 # Versi fallback teks biasa
                 plain_message = strip_tags(html_message)
-                
+
                 send_mail(
                     subject=subject,
                     message=plain_message,
@@ -90,15 +90,15 @@ def login_view(request):
                     html_message=html_message, # <--- Wajib dipasang agar HTML ter-render
                     fail_silently=False,
                 )
-                
+
                 # 4. Arahkan ke halaman input OTP
                 messages.info(request, 'Kode OTP telah dikirim ke email Anda.')
                 return redirect('users:verify_otp')
-            
+
             else:
                 # Jika 2FA mati, langsung login normal seperti biasa
                 login(request, user)
-                return redirect('users:dashboard') 
+                return redirect('users:dashboard')
         else:
             messages.error(request, 'Username atau password salah! Silakan coba lagi.')
 
@@ -119,11 +119,11 @@ def verify_otp_view(request):
         if input_otp == saved_otp:
             user = User.objects.get(id=user_id)
             login(request, user) # Baru login-kan user-nya di sini!
-            
+
             # Hapus jejak OTP dari session demi keamanan
             del request.session['pending_user_id']
             del request.session['2fa_otp']
-            
+
             messages.success(request, 'Verifikasi berhasil. Selamat datang!')
             return redirect('users:dashboard')
         else:
@@ -132,8 +132,8 @@ def verify_otp_view(request):
     return render(request, 'users/verify_otp.html')
 
 def password_reset_success_view(request):
-    logout(request) 
-    
+    logout(request)
+
     return render(request, 'password_reset_success.html')
 
 # --- HALAMAN REGISTRASI ---
@@ -157,8 +157,8 @@ def register_view(request):
             return redirect('users:register')
 
         user = User.objects.create_user(
-            username=username_input, 
-            email=email_input, 
+            username=username_input,
+            email=email_input,
             password=password_input
         )
         user.save()
@@ -174,25 +174,25 @@ def dashboard_view(request):
     # --- LOGIKA MATERI ---
     doc_type = request.GET.get('type', 'all')
     sort_materi = request.GET.get('sort', 'terbaru')
-    
+
     dokumen = DokumenMateri.objects.filter(user=request.user)
-    
+
     if doc_type != 'all':
         # Filter berdasarkan ekstensi file di database
         dokumen = dokumen.filter(file_dokumen__icontains=doc_type)
-        
+
     order_materi = '-tanggal_unggah' if sort_materi == 'terbaru' else 'tanggal_unggah'
     dokumen_terbaru = dokumen.order_by(order_materi)
 
     # --- LOGIKA TUGAS ---
     difficulty = request.GET.get('difficulty', 'all')
     sort_tugas = request.GET.get('sort_tugas', 'terdekat')
-    
+
     tugas = Tugas.objects.filter(user=request.user, is_selesai=False)
-    
+
     if difficulty != 'all':
         tugas = tugas.filter(tingkat_kesulitan=difficulty)
-        
+
     order_tugas = 'tenggat_waktu' if sort_tugas == 'terdekat' else '-tenggat_waktu'
     tugas_aktif = tugas.order_by(order_tugas)
 
@@ -204,7 +204,7 @@ def dashboard_view(request):
 @login_required
 def task_list_view(request):
     user = request.user
-    
+
     # Menangkap permintaan urutan dari form dropdown
     sort_by = request.GET.get('sort', 'terdekat')
 
@@ -233,53 +233,48 @@ def settings_view(request):
         if action == 'edit_profil':
             if 'foto_profil' in request.FILES:
                 user.foto_profil = request.FILES['foto_profil']
-            
+
             user.username = request.POST.get('username', user.username)
             user.bio = request.POST.get('bio', user.bio)
             user.jenis_kelamin = request.POST.get('jenis_kelamin', user.jenis_kelamin)
-            
+
             # Cek tanggal lahir agar tidak error format jika input dikosongkan
             tgl_lahir = request.POST.get('tanggal_lahir')
             if tgl_lahir:
                 user.tanggal_lahir = tgl_lahir
-                
+
             user.nama_instansi = request.POST.get('institusi', user.nama_instansi)
             user.lokasi = request.POST.get('lokasi', user.lokasi)
-            
+
             user.save()
             messages.success(request, 'Profil publik berhasil diperbarui!')
             return redirect('users:settings')
-        
+
         elif action == 'toggle_notif':
             # Jika dicentang, HTML akan mengirim nilai 'on'. Jika dimatikan, nilainya kosong.
             status = request.POST.get('status_notif')
-            
+
             if status == 'on':
                 request.user.is_pengingat_aktif = True
                 messages.success(request, 'Fitur pengingat diaktifkan!')
             else:
                 request.user.is_pengingat_aktif = False
                 messages.warning(request, 'Fitur pengingat telah disembunyikan.')
-                
+
             request.user.save()
             return redirect('users:settings') # Sesuaikan dengan nama URL settings kamu
 
+
         # --- TAB 2: INFORMASI PRIBADI ---
         elif action == 'informasi_pribadi':
-            # Pecah nama lengkap jadi First Name dan Last Name bawaan Django
-            nama_lengkap = request.POST.get('nama_lengkap', '')
-            if ' ' in nama_lengkap:
-                user.first_name, user.last_name = nama_lengkap.split(' ', 1)
-            else:
-                user.first_name = nama_lengkap
-                user.last_name = ''
+            # Tangkap data sesuai dengan name="" yang ada di form settings.html
+            user.nomor_induk = request.POST.get('nomor_induk', user.nomor_induk)
+            user.nama_instansi = request.POST.get('nama_instansi', user.nama_instansi)
+            user.tingkat_pendidikan = request.POST.get('tingkat_pendidikan', user.tingkat_pendidikan)
+            user.bidang_studi = request.POST.get('bidang_studi', user.bidang_studi)
 
-            user.email = request.POST.get('email', user.email)
-            user.nomor_telepon = request.POST.get('nomor_telepon', user.nomor_telepon)
-            user.alamat_lengkap = request.POST.get('alamat_lengkap', user.alamat_lengkap)
-            
             user.save()
-            messages.success(request, 'Informasi pribadi berhasil disimpan!')
+            messages.success(request, 'Informasi formal/akademik berhasil disimpan!')
             return redirect('users:settings')
 
         # --- TAB 3: KATA SANDI & AUTENTIKASI ---
@@ -290,22 +285,22 @@ def settings_view(request):
             confirm_password = request.POST.get('confirm_password', '').strip()
 
             password_changed = False
-            
+
             # Jika user MENGETIK SESUATU di salah satu kolom password
             if old_password or new_password or confirm_password:
                 # Cegah user yang hanya mengisi 1 kolom tapi mengosongkan yang lain
                 if not old_password or not new_password or not confirm_password:
                     messages.error(request, 'Harap isi SEMUA kolom password jika ingin mengubahnya!')
                     return redirect('users:settings')
-                
+
                 if not user.check_password(old_password):
                     messages.error(request, 'Password lama Anda salah!')
                     return redirect('users:settings')
-                
+
                 if new_password != confirm_password:
                     messages.error(request, 'Password baru dan konfirmasi tidak cocok!')
                     return redirect('users:settings')
-                
+
                 user.set_password(new_password)
                 update_session_auth_hash(request, user) # Pertahankan sesi login
                 password_changed = True
@@ -335,7 +330,7 @@ def settings_view(request):
 def dashboard_view(request):
     # Ambil parameter tab dari URL, defaultnya 'materi'
     active_tab = request.GET.get('active_tab', 'materi')
-    
+
     # --- LOGIKA MATERI ---
     doc_type = request.GET.get('type', 'all')
     sort_materi = request.GET.get('sort', 'terbaru')
@@ -349,15 +344,17 @@ def dashboard_view(request):
     difficulty = request.GET.get('difficulty', 'all')
     sort_tugas = request.GET.get('sort_tugas', 'terdekat')
     tugas = Tugas.objects.filter(user=request.user, is_selesai=False)
+
     if difficulty != 'all':
         tugas = tugas.filter(tingkat_kesulitan=difficulty)
+
     order_tugas = 'tenggat_waktu' if sort_tugas == 'terdekat' else '-tenggat_waktu'
     tugas_aktif = tugas.order_by(order_tugas)
 
     return render(request, 'users/dashboard.html', {
         'dokumen_terbaru': dokumen_terbaru,
         'tugas_aktif': tugas_aktif,
-        'active_tab': active_tab, # <--- Tambahkan ini
+        'active_tab': active_tab,
     })
 
 # --- FITUR LOGOUT ---

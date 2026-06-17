@@ -8,8 +8,8 @@
     .upload-container { 
         display: flex; 
         flex-direction: column; 
-        padding: 10px 20px;
-        height: calc(100vh - 100px); 
+        padding: 20px;
+        min-height: calc(100vh - 100px); /* Diubah ke min-height agar responsif di layar kecil */
         justify-content: center;
         position: relative;
     }
@@ -144,6 +144,38 @@
     .alert { padding: 12px 15px; border-radius: 12px; margin-bottom: 15px; font-weight: 700; font-size: 0.85rem; text-align: left; }
     .alert-danger { background-color: #fef2f2; color: #ef4444; border: 1px solid #fecaca; }
     .alert-success { background-color: #ecfdf5; color: #10b981; border: 1px solid #a7f3d0; }
+
+    /* =========================================
+       MEDIA QUERIES UNTUK RESPONSIVITAS
+       ========================================= */
+    @media (max-width: 768px) {
+        .split-grid {
+            grid-template-columns: 1fr; /* Ubah menjadi 1 kolom yang menumpuk */
+            gap: 20px;
+        }
+
+        .upload-card {
+            padding: 25px 20px;
+        }
+
+        .home-link {
+            top: 20px;
+            right: 20px;
+        }
+
+        .upload-header {
+            width: 100%;
+            padding-right: 35px; /* Mencegah teks tertutup tombol home */
+        }
+
+        .upload-header h2 {
+            font-size: 1.35rem;
+        }
+
+        .drop-zone {
+            min-height: 180px;
+        }
+    }
 </style>
 {% endblock %}
 

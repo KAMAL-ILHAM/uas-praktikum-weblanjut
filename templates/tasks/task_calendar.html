@@ -12,6 +12,8 @@
         justify-content: space-between; 
         align-items: center; 
         margin-bottom: 25px; 
+        flex-wrap: wrap;
+        gap: 15px;
     }
     
     .title-area { 
@@ -30,6 +32,7 @@
         align-items: center; 
         justify-content: center; 
         font-size: 1.5rem; 
+        flex-shrink: 0;
     }
     
     .scheduler-header h2 { 
@@ -72,6 +75,13 @@
         padding-bottom: 0; 
         margin-bottom: 30px; 
         position: relative; 
+        overflow-x: auto;
+        white-space: nowrap;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    .custom-tabs::-webkit-scrollbar {
+        display: none;
     }
     
     .custom-tab-link { 
@@ -328,6 +338,44 @@
         font-weight: 700; 
         font-size: 1rem; 
         color: #94a3b8; 
+    }
+
+    /* ========================================= */
+    /* MEDIA QUERIES UNTUK RESPONSIVITAS         */
+    /* ========================================= */
+    @media (max-width: 992px) {
+        .scheduler-grid {
+            grid-template-columns: 1fr; /* Stack kalender dan detail */
+            gap: 25px;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .scheduler-header h2 {
+            font-size: 1.35rem;
+        }
+
+        .icon-box-large {
+            width: 40px;
+            height: 40px;
+            font-size: 1.2rem;
+        }
+
+        .calendar-card, .detail-card {
+            padding: 20px;
+        }
+
+        .cal-header h3 {
+            font-size: 1.2rem;
+        }
+
+        .cal-date {
+            font-size: 0.95rem;
+        }
+
+        .archive-item {
+            padding: 15px;
+        }
     }
 </style>
 {% endblock %}

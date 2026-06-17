@@ -228,6 +228,85 @@
     .form-control:focus, .form-select:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(99, 60, 245, 0.1); }
     .btn-save-modal { background: var(--primary); color: white; border: none; border-radius: 8px; padding: 10px 20px; font-weight: 700; width: 100%; transition: 0.2s; }
     .btn-save-modal:hover { background: #5028e3; color: white; }
+
+    /* Overlay Styling untuk Modal Logout */
+    .modal-overlay {
+        display: none;
+        position: fixed;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: rgba(0,0,0,0.5);
+        z-index: 1050;
+        align-items: center;
+        justify-content: center;
+        backdrop-filter: blur(3px);
+    }
+    .modal-box {
+        background: var(--white, #fff);
+        padding: 30px;
+        border-radius: 16px;
+        width: 90%;
+        max-width: 400px;
+        text-align: center;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    }
+
+    /* =========================================
+       MEDIA QUERIES UNTUK RESPONSIVITAS
+       ========================================= */
+    
+    /* Layar Menengah (Tablet) */
+    @media (max-width: 992px) {
+        .content-wrapper {
+            grid-template-columns: 1fr; /* Ubah ke 1 kolom */
+            gap: 25px;
+        }
+    }
+
+    /* Layar Kecil (Mobile) */
+    @media (max-width: 576px) {
+        .top-header {
+            margin-bottom: 20px;
+        }
+        
+        .header-title h2 {
+            font-size: 1.5rem;
+        }
+
+        .profile-info-container {
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            padding: 0 20px 25px;
+            margin-top: -55px;
+        }
+
+        .avatar-wrapper {
+            margin-right: 0;
+            margin-bottom: 15px;
+        }
+
+        .btn-edit-profile {
+            margin-left: 0;
+            margin-top: 20px;
+            width: 100%;
+        }
+
+        .setting-item {
+            padding: 14px 15px;
+        }
+
+        .icon-box {
+            margin-right: 12px;
+        }
+        
+        .setting-text {
+            font-size: 0.9rem;
+        }
+        
+        .text-value {
+            font-size: 0.8rem;
+        }
+    }
 </style>
 {% endblock %}
 
@@ -259,7 +338,7 @@
     </div>
 </div>
 
-<!-- Kontainer Utama (2 Kolom) -->
+<!-- Kontainer Utama -->
 <div class="content-wrapper">
     
     <!-- Kolom Kiri -->
@@ -590,17 +669,18 @@
     </div>
 </div>
 
+<!-- Modal Custom Logout -->
 <div class="modal-overlay" id="modalLogout">
     <div class="modal-box">
-        <h4 style="font-weight: 800; color: var(--text-main); margin-bottom: 10px;">Keluar Akun</h4>
-        <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 25px;">
+        <h4 style="font-weight: 800; color: var(--text-main, #1e293b); margin-bottom: 10px;">Keluar Akun</h4>
+        <p style="color: var(--text-muted, #64748b); font-size: 0.95rem; margin-bottom: 25px;">
             Apakah Anda yakin ingin keluar dari akun EIO Master?
         </p>
         <div class="d-flex gap-3">
-            <button onclick="tutupModalLogout()" style="flex: 1; padding: 12px; border: none; border-radius: 12px; background: var(--border-color); color: var(--text-main); font-weight: 700; cursor: pointer;">
+            <button onclick="tutupModalLogout()" style="flex: 1; padding: 12px; border: none; border-radius: 12px; background: var(--border-color, #e2e8f0); color: var(--text-main, #1e293b); font-weight: 700; cursor: pointer; transition: 0.2s;">
                 Tidak
             </button>
-            <a href="{% url 'users:logout' %}" style="flex: 1; padding: 12px; border: none; border-radius: 12px; background: #ef4444; color: white; font-weight: 700; text-decoration: none; text-align: center;">
+            <a href="{% url 'users:logout' %}" style="flex: 1; padding: 12px; border: none; border-radius: 12px; background: #ef4444; color: white; font-weight: 700; text-decoration: none; text-align: center; transition: 0.2s;">
                 Ya, Keluar
             </a>
         </div>
@@ -635,10 +715,13 @@
             }
         }
 
-        check2faStatus();
-        switch2fa.addEventListener("change", check2faStatus);
+        if(switch2fa) {
+            check2faStatus();
+            switch2fa.addEventListener("change", check2faStatus);
+        }
     });
 
+    // Handle Modal Logout Custom
     function bukaModalLogout() {
         document.getElementById('modalLogout').style.display = 'flex';
     }

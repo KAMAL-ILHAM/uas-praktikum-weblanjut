@@ -12,6 +12,8 @@
         justify-content: space-between; 
         align-items: center; 
         margin-bottom: 25px; 
+        flex-wrap: wrap; /* Menambahkan flex-wrap untuk responsivitas */
+        gap: 15px;
     }
     
     .title-area { 
@@ -30,6 +32,7 @@
         align-items: center; 
         justify-content: center; 
         font-size: 1.5rem; 
+        flex-shrink: 0;
     }
     
     .scheduler-header h2 { 
@@ -72,6 +75,13 @@
         padding-bottom: 0; 
         margin-bottom: 30px; 
         position: relative; 
+        overflow-x: auto; /* Memungkinkan scroll horizontal di mobile */
+        white-space: nowrap;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    .custom-tabs::-webkit-scrollbar {
+        display: none; /* Menyembunyikan scrollbar untuk tampilan bersih */
     }
     
     .custom-tab-link { 
@@ -113,7 +123,7 @@
         display: grid; 
         grid-template-columns: 1fr 400px; 
         gap: 35px; 
-        align-items: stretch; 
+        align-items: start; /* Ubah dari stretch agar proporsional */
         padding-bottom: 50px; 
         animation: fadeIn 0.3s ease-in-out; 
     }
@@ -140,7 +150,8 @@
         flex-direction: column; 
         gap: 15px; 
         margin-bottom: 15px; 
-        min-height: 400px; 
+        min-height: 300px; /* Disesuaikan agar tidak terlalu tinggi di mobile */
+        max-height: 70vh; /* Membatasi tinggi maksimum agar scrollable */
     }
     
     .task-scroll-area::-webkit-scrollbar { 
@@ -227,6 +238,7 @@
         display: flex; 
         align-items: center; 
         gap: 20px; 
+        flex-wrap: wrap;
     }
     
     .btn-selesai { 
@@ -327,6 +339,8 @@
         position: relative; 
         animation: slideUp 0.3s ease; 
         box-shadow: 0 20px 50px rgba(0,0,0,0.1); 
+        max-height: 90vh;
+        overflow-y: auto;
     }
     
     @keyframes slideUp { 
@@ -424,6 +438,55 @@
         transition: 0.2s; 
         box-shadow: 0 8px 20px rgba(99, 60, 245, 0.25); 
         margin-top: auto; 
+    }
+
+    /* ========================================= */
+    /* MEDIA QUERIES UNTUK RESPONSIVITAS         */
+    /* ========================================= */
+    @media (max-width: 992px) {
+        .scheduler-grid {
+            grid-template-columns: 1fr; /* Mengubah menjadi 1 kolom (stack) */
+            gap: 25px;
+        }
+        
+        .task-scroll-area {
+            max-height: none; /* Membiarkan daftar tugas mengalir ke bawah */
+        }
+    }
+
+    @media (max-width: 576px) {
+        .scheduler-header h2 {
+            font-size: 1.35rem;
+        }
+
+        .icon-box-large {
+            width: 40px;
+            height: 40px;
+            font-size: 1.2rem;
+        }
+
+        .task-card {
+            padding: 15px 20px;
+        }
+
+        .form-card {
+            padding: 20px;
+        }
+
+        .task-card .d-flex.justify-content-between {
+            flex-direction: column;
+            align-items: flex-start !important;
+            gap: 10px;
+        }
+
+        .btn-selesai.btn-detail-trigger {
+            width: 100%;
+            justify-content: center;
+        }
+
+        .modal-box {
+            padding: 20px;
+        }
     }
 </style>
 {% endblock %}

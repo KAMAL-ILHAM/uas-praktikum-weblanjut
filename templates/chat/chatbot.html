@@ -34,7 +34,9 @@
             display: flex;
         }
 
-        /* Sidebar Styling */
+        /* -------------------------------------
+           SIDEBAR STYLING 
+           ------------------------------------- */
         .chat-sidebar {
             width: 280px; 
             background: var(--bg-sidebar); 
@@ -43,31 +45,38 @@
             flex-direction: column; 
             padding: 25px 20px; 
             flex-shrink: 0;
-            margin-left: -280px; 
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
             overflow-y: auto; 
+            
+            /* Pengaturan Default untuk Mobile (Sembunyi) */
+            position: fixed;
+            height: 100vh;
+            z-index: 1040;
+            margin-left: -280px;
+            box-shadow: 10px 0 50px rgba(0,0,0,0.1);
         }
         
         .chat-sidebar.show { 
             margin-left: 0; 
         }
-        
-        .chat-sidebar::-webkit-scrollbar { 
-            width: 6px; 
+
+        /* Tampilan Khusus Laptop/Desktop */
+        @media (min-width: 992px) {
+            .chat-sidebar {
+                position: static;
+                height: 100vh;
+                margin-left: 0; /* Selalu tampil di desktop */
+                box-shadow: none;
+            }
+            .chat-sidebar.collapsed {
+                margin-left: -280px; /* Kelas jika ingin ditutup di desktop */
+            }
         }
         
-        .chat-sidebar::-webkit-scrollbar-track { 
-            background: transparent; 
-        }
-        
-        .chat-sidebar::-webkit-scrollbar-thumb { 
-            background: #e2e8f0; 
-            border-radius: 10px; 
-        }
-        
-        .chat-sidebar::-webkit-scrollbar-thumb:hover { 
-            background: #cbd5e1; 
-        }
+        .chat-sidebar::-webkit-scrollbar { width: 6px; }
+        .chat-sidebar::-webkit-scrollbar-track { background: transparent; }
+        .chat-sidebar::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
+        .chat-sidebar::-webkit-scrollbar-thumb:hover { background: #cbd5e1; }
 
         .btn-new-chat {
             background: #0f172a; 
@@ -87,8 +96,6 @@
             box-shadow: 0 4px 15px rgba(15, 23, 42, 0.15); 
             flex-shrink: 0;
         }
-        
-        
 
         .btn-new-chat:hover { 
             background: #1e293b; 
@@ -96,21 +103,13 @@
         }
 
         /* History List */
-        .history-group { 
-            margin-bottom: 25px; 
-        }
-        
+        .history-group { margin-bottom: 25px; }
         .history-label { 
-            font-size: 0.75rem; 
-            font-weight: 800; 
-            color: #94a3b8; 
-            text-transform: uppercase; 
-            letter-spacing: 1px; 
-            margin-bottom: 15px; 
-            padding-left: 10px; 
+            font-size: 0.75rem; font-weight: 800; color: #94a3b8; 
+            text-transform: uppercase; letter-spacing: 1px; 
+            margin-bottom: 15px; padding-left: 10px; 
         }
         
-        /* MODIFIKASI WRAPPER HISTORY ITEM BIAR BISA ADA TOMBOL HAPUS */
         .history-item-wrapper {
             position: relative;
             display: flex;
@@ -121,501 +120,203 @@
 
         .history-item {
             flex: 1;
-            display: flex; 
-            align-items: center; 
-            gap: 12px; 
-            padding: 12px 40px 12px 15px; 
+            display: flex; align-items: center; gap: 12px; 
+            padding: 12px 65px 12px 15px; /* Ditambah padding kanan agar text tidak nabrak tombol */
             border-radius: 12px;
-            color: var(--text-main); 
-            font-weight: 600; 
-            font-size: 0.9rem;
-            text-decoration: none; 
-            transition: 0.2s; 
-            white-space: nowrap; 
-            overflow: hidden; 
-            text-overflow: ellipsis; 
+            color: var(--text-main); font-weight: 600; font-size: 0.9rem;
+            text-decoration: none; transition: 0.2s; 
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis; 
         }
         
-        .history-item i { 
-            color: #94a3b8; 
-            font-size: 1.1rem; 
-            flex-shrink: 0; 
-        }
-        
-        .history-item-wrapper:hover .history-item { 
-            background: #f1f5f9; 
-        }
-        
-        .history-item-wrapper.active-session .history-item { 
-            background: #f5f3ff; 
-            color: var(--primary); 
-        }
-        
-        .history-item-wrapper.active-session .history-item i { 
-            color: var(--primary); 
-        }
+        .history-item i { color: #94a3b8; font-size: 1.1rem; flex-shrink: 0; }
+        .history-item-wrapper:hover .history-item { background: #f1f5f9; }
+        .history-item-wrapper.active-session .history-item { background: #f5f3ff; color: var(--primary); }
+        .history-item-wrapper.active-session .history-item i { color: var(--primary); }
 
-        /* TOMBOL SAMPAH KECIL INTERAKTIF */
-        .btn-delete-session {
-            position: absolute;
-            right: 12px;
-            background: transparent;
-            border: none;
-            color: #94a3b8;
-            cursor: pointer;
-            padding: 4px;
-            border-radius: 6px;
-            display: none; /* Sembunyikan default */
-            transition: all 0.2s;
-            font-size: 0.85rem;
+        /* Grup Tombol Edit & Hapus */
+        .history-actions {
+            position: absolute; right: 8px;
+            display: flex; gap: 4px;
+            display: none; /* Disembunyikan secara default */
             z-index: 5;
         }
+        
+        .history-item-wrapper:hover .history-actions { display: flex; } /* Tampil saat dihover */
 
-        .history-item-wrapper:hover .btn-delete-session {
-            display: block; /* Tampilkan pas baris di-hover */
+        .btn-action-session {
+            background: transparent; border: none; color: #94a3b8;
+            cursor: pointer; padding: 6px; border-radius: 6px;
+            transition: all 0.2s; font-size: 0.85rem;
         }
+        .btn-action-session.edit:hover { color: #3b82f6; background: #eff6ff; }
+        .btn-action-session.delete:hover { color: #ef4444; background: #fef2f2; }
 
-        .btn-delete-session:hover {
-            color: #ef4444;
-            background: #fef2f2;
-        }
-
-        /* Main Chat Area */
+        /* -------------------------------------
+           MAIN CHAT AREA 
+           ------------------------------------- */
         .chat-main { 
-            flex: 1; 
-            display: flex; 
-            flex-direction: column; 
-            background: var(--bg-canvas); 
-            position: relative; 
+            flex: 1; display: flex; flex-direction: column; 
+            background: var(--bg-canvas); position: relative; 
             transition: all 0.3s ease; 
+        }
+
+        /* Overlay Gelap Mobile */
+        .sidebar-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(15, 23, 42, 0.4);
+            z-index: 1035; display: none; opacity: 0; transition: opacity 0.3s;
+            backdrop-filter: blur(2px);
+        }
+        .sidebar-overlay.active { display: block; opacity: 1; }
+
+        @media (min-width: 992px) {
+            .sidebar-overlay { display: none !important; }
         }
 
         /* Header */
         .chat-header { 
-            padding: 20px 40px; 
-            background: var(--bg-canvas); 
+            padding: 20px 40px; background: var(--bg-canvas); 
             border-bottom: 1px solid var(--border-color); 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            z-index: 10; 
+            display: flex; justify-content: space-between; 
+            align-items: center; z-index: 10; 
         }
         
-        .ai-identity { 
-            display: flex; 
-            align-items: center; 
-            gap: 15px; 
-        }
-        
+        .ai-identity { display: flex; align-items: center; gap: 15px; }
         .ai-avatar { 
-            width: 45px; 
-            height: 45px; 
-            border-radius: 14px; 
+            width: 45px; height: 45px; border-radius: 14px; 
             background: linear-gradient(135deg, #633cf5 0%, #8668ff 100%); 
-            color: white; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            font-size: 1.4rem; 
-            box-shadow: 0 4px 15px rgba(99, 60, 245, 0.2); 
+            color: white; display: flex; align-items: center; justify-content: center; 
+            font-size: 1.4rem; box-shadow: 0 4px 15px rgba(99, 60, 245, 0.2); 
         }
+        .ai-identity h2 { margin: 0; font-size: 1.3rem; font-weight: 800; color: var(--text-main); }
         
-        .ai-identity h2 { 
-            margin: 0; 
-            font-size: 1.3rem; 
-            font-weight: 800; 
-            color: var(--text-main); 
-        }
-        
-        .header-actions { 
-            display: flex; 
-            gap: 12px; 
-            align-items: center; 
-        }
+        .header-actions { display: flex; gap: 12px; align-items: center; }
         
         .btn-history-icon { 
-            color: var(--text-muted); 
-            background: transparent; 
-            border: 1px solid var(--border-color); 
-            font-size: 1.1rem; 
-            cursor: pointer; 
-            transition: 0.2s; 
-            width: 40px; 
-            height: 40px; 
-            border-radius: 10px; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
+            color: var(--text-muted); background: transparent; 
+            border: 1px solid var(--border-color); font-size: 1.1rem; 
+            cursor: pointer; transition: 0.2s; width: 40px; height: 40px; 
+            border-radius: 10px; display: flex; align-items: center; justify-content: center; 
         }
-        
-        .btn-history-icon:hover { 
-            color: var(--primary); 
-            background: #f1f5f9; 
-            border-color: transparent; 
-        }
-        
-        .btn-history-icon.active { 
-            color: var(--primary); 
-            background: #f5f3ff; 
-            border-color: transparent; 
-        }
+        .btn-history-icon:hover { color: var(--primary); background: #f1f5f9; border-color: transparent; }
+        .btn-history-icon.active { color: var(--primary); background: #f5f3ff; border-color: transparent; }
         
         .btn-exit-dashboard { 
-            color: #ef4444; 
-            background: #fef2f2; 
-            border: 1px solid #fecaca; 
-            font-size: 1.1rem; 
-            cursor: pointer; 
-            transition: 0.2s; 
-            width: 40px; 
-            height: 40px; 
-            border-radius: 10px; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            text-decoration: none; 
+            color: #ef4444; background: #fef2f2; border: 1px solid #fecaca; 
+            font-size: 1.1rem; cursor: pointer; transition: 0.2s; width: 40px; height: 40px; 
+            border-radius: 10px; display: flex; align-items: center; justify-content: center; text-decoration: none; 
         }
-        
-        .btn-exit-dashboard:hover { 
-            background: #fee2e2; 
-            color: #dc2626; 
-            transform: translateY(-2px); 
-            box-shadow: 0 4px 10px rgba(239, 68, 68, 0.15); 
-        }
+        .btn-exit-dashboard:hover { background: #fee2e2; color: #dc2626; transform: translateY(-2px); }
 
         /* Message Area */
         .chat-messages { 
-            flex: 1; 
-            padding: 40px 15%; 
-            overflow-y: auto; 
-            display: flex; 
-            flex-direction: column; 
-            gap: 30px; 
-            scroll-behavior: smooth; 
+            flex: 1; padding: 40px 15%; overflow-y: auto; 
+            display: flex; flex-direction: column; gap: 30px; scroll-behavior: smooth; 
         }
-        
-        .chat-messages::-webkit-scrollbar { 
-            width: 8px; 
-        }
-        
-        .chat-messages::-webkit-scrollbar-track { 
-            background: transparent; 
-        }
-        
-        .chat-messages::-webkit-scrollbar-thumb { 
-            background: #cbd5e1; 
-            border-radius: 10px; 
-        }
+        .chat-messages::-webkit-scrollbar { width: 8px; }
+        .chat-messages::-webkit-scrollbar-track { background: transparent; }
+        .chat-messages::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
 
         /* Message Bubbles */
-        .message-row { 
-            display: flex; 
-            gap: 20px; 
-            max-width: 85%; 
-            animation: fadeInUp 0.4s ease; 
-        }
+        .message-row { display: flex; gap: 20px; max-width: 85%; animation: fadeInUp 0.4s ease; }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         
-        @keyframes fadeInUp { 
-            from { opacity: 0; transform: translateY(10px); } 
-            to { opacity: 1; transform: translateY(0); } 
-        }
-        
-        .message-row.user { 
-            margin-left: auto; 
-            flex-direction: row-reverse; 
-        }
+        .message-row.user { margin-left: auto; flex-direction: row-reverse; }
 
-        .msg-avatar { 
-            width: 35px; 
-            height: 35px; 
-            border-radius: 10px; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            flex-shrink: 0; 
-            font-size: 1rem; 
-        }
-        
-        .msg-avatar.ai { 
-            background: #f5f3ff; 
-            color: var(--primary); 
-        }
-        
-        .msg-avatar.user-avatar { 
-            background: #e2e8f0; 
-            color: #475569; 
-            font-weight: bold; 
-        }
+        .msg-avatar { width: 35px; height: 35px; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 1rem; }
+        .msg-avatar.ai { background: #f5f3ff; color: var(--primary); }
+        .msg-avatar.user-avatar { background: #e2e8f0; color: #475569; font-weight: bold; }
         
         .bubble { 
-            padding: 20px 25px; 
-            border-radius: 20px; 
-            font-size: 1rem; 
-            line-height: 1.7; 
-            font-weight: 500; 
-            position: relative; 
-            box-shadow: 0 4px 20px rgba(0,0,0,0.02); 
-            word-wrap: break-word; 
+            padding: 20px 25px; border-radius: 20px; font-size: 1rem; line-height: 1.7; 
+            font-weight: 500; position: relative; box-shadow: 0 4px 20px rgba(0,0,0,0.02); word-wrap: break-word; 
         }
-        
-        .bubble.ai { 
-            background: var(--white); 
-            color: var(--text-main); 
-            border: 1px solid var(--border-color); 
-            border-top-left-radius: 4px; 
-        }
-        
-        .bubble.user { 
-            background: var(--primary); 
-            color: white; 
-            border-top-right-radius: 4px; 
-            box-shadow: 0 8px 25px rgba(99, 60, 245, 0.25); 
-        }
+        .bubble.ai { background: var(--white); color: var(--text-main); border: 1px solid var(--border-color); border-top-left-radius: 4px; }
+        .bubble.user { background: var(--primary); color: white; border-top-right-radius: 4px; box-shadow: 0 8px 25px rgba(99, 60, 245, 0.25); }
 
         /* Markdown Styles within AI Bubble */
-        .bubble.ai p { 
-            margin-bottom: 10px; 
-        }
-        
-        .bubble.ai p:last-child { 
-            margin-bottom: 0; 
-        }
-        
-        .bubble.ai pre { 
-            background: #f1f5f9; 
-            padding: 15px; 
-            border-radius: 10px; 
-            overflow-x: auto; 
-            font-size: 0.9em; 
-        }
-        
-        .bubble.ai code { 
-            background: #f1f5f9; 
-            padding: 2px 6px; 
-            border-radius: 5px; 
-            font-size: 0.9em; 
-            color: #ef4444; 
-        }
+        .bubble.ai p { margin-bottom: 10px; }
+        .bubble.ai p:last-child { margin-bottom: 0; }
+        .bubble.ai pre { background: #f1f5f9; padding: 15px; border-radius: 10px; overflow-x: auto; font-size: 0.9em; }
+        .bubble.ai code { background: #f1f5f9; padding: 2px 6px; border-radius: 5px; font-size: 0.9em; color: #ef4444; }
 
-        .msg-time { 
-            font-size: 0.75rem; 
-            color: #94a3b8; 
-            font-weight: 600; 
-            margin-top: 8px; 
-            text-align: left; 
-        }
-        
-        .message-row.user .msg-time { 
-            text-align: right; 
-        }
+        .msg-time { font-size: 0.75rem; color: #94a3b8; font-weight: 600; margin-top: 8px; text-align: left; }
+        .message-row.user .msg-time { text-align: right; }
 
         /* Typing Indicator Animation */
-        .typing-indicator { 
-            display: flex; 
-            gap: 5px; 
-            align-items: center; 
-            height: 24px; 
-            padding: 0 10px; 
-        }
-        
-        .typing-dot { 
-            width: 8px; 
-            height: 8px; 
-            background: var(--primary); 
-            border-radius: 50%; 
-            animation: typing 1.4s infinite ease-in-out both; 
-        }
-        
+        .typing-indicator { display: flex; gap: 5px; align-items: center; height: 24px; padding: 0 10px; }
+        .typing-dot { width: 8px; height: 8px; background: var(--primary); border-radius: 50%; animation: typing 1.4s infinite ease-in-out both; }
         .typing-dot:nth-child(1) { animation-delay: -0.32s; }
         .typing-dot:nth-child(2) { animation-delay: -0.16s; }
-        
-        @keyframes typing { 
-            0%, 80%, 100% { transform: scale(0); } 
-            40% { transform: scale(1); } 
-        }
+        @keyframes typing { 0%, 80%, 100% { transform: scale(0); } 40% { transform: scale(1); } }
 
         /* Input Form Area */
-        .chat-input-wrapper { 
-            padding: 30px 15%; 
-            background: linear-gradient(to top, var(--bg-canvas) 70%, transparent); 
-        }
-        
+        .chat-input-wrapper { padding: 30px 15%; background: linear-gradient(to top, var(--bg-canvas) 70%, transparent); }
         .input-box { 
-            background: var(--white); 
-            border-radius: 50px; 
-            padding: 10px 15px 10px 20px; 
-            display: flex; 
-            align-items: center; 
-            gap: 15px; 
-            box-shadow: 0 10px 30px rgba(0,0,0,0.05); 
-            border: 1px solid var(--border-color); 
+            background: var(--white); border-radius: 50px; padding: 10px 15px 10px 20px; 
+            display: flex; align-items: center; gap: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); border: 1px solid var(--border-color); 
         }
+        .btn-attachment { width: 36px; height: 36px; border-radius: 50%; background: #f1f5f9; color: #64748b; border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s; font-size: 0.9rem; flex-shrink: 0; }
+        .btn-attachment:hover { background: #e2e8f0; color: var(--text-main); }
+        .chat-input { flex: 1; border: none; background: transparent; outline: none; font-size: 1rem; color: var(--text-main); font-weight: 500; font-family: inherit; }
+        .chat-input::placeholder { color: #94a3b8; }
+        .btn-send { width: 44px; height: 44px; border-radius: 50%; background: var(--primary); color: white; border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s; font-size: 1.1rem; flex-shrink: 0; box-shadow: 0 4px 15px rgba(99, 60, 245, 0.3); }
+        .btn-send:hover { transform: scale(1.05); }
+        .btn-send:disabled { background: #cbd5e1; cursor: not-allowed; transform: none; box-shadow: none; }
+
+        /* -------------------------------------
+           MODAL KUSTOM (HAPUS & RENAME) 
+           ------------------------------------- */
+        .modal-overlay-kustom { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.4); z-index: 99999; justify-content: center; align-items: center; backdrop-filter: blur(8px); transition: all 0.3s ease; }
+        .modal-box-kustom { background: #ffffff; width: 90%; max-width: 400px; border-radius: 24px; padding: 35px 30px; text-align: center; box-shadow: 0 25px 70px rgba(15, 23, 42, 0.15); border: 1px solid #f1f5f9; animation: popUpScale 0.25s cubic-bezier(0.34, 1.56, 0.64, 1); }
+        @keyframes popUpScale { from { transform: scale(0.9) translateY(10px); opacity: 0; } to { transform: scale(1) translateY(0); opacity: 1; } }
         
-        .btn-attachment { 
-            width: 36px; 
-            height: 36px; 
-            border-radius: 50%; 
-            background: #f1f5f9; 
-            color: #64748b; 
-            border: none; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            cursor: pointer; 
-            transition: 0.2s; 
-            font-size: 0.9rem; 
-            flex-shrink: 0; 
-        }
+        .modal-icon-warning { width: 60px; height: 60px; background: #fef2f2; color: #ef4444; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.6rem; margin: 0 auto 20px; }
+        .modal-icon-info { width: 60px; height: 60px; background: #eff6ff; color: #3b82f6; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; margin: 0 auto 20px; }
         
-        .btn-attachment:hover { 
-            background: #e2e8f0; 
-            color: var(--text-main); 
-        }
+        .modal-box-kustom h3 { font-weight: 800; color: #1e293b; font-size: 1.35rem; margin-bottom: 10px; }
+        .modal-box-kustom p { color: #64748b; font-size: 0.95rem; line-height: 1.5; margin-bottom: 25px; font-weight: 500; }
         
-        .chat-input { 
-            flex: 1; 
-            border: none; 
-            background: transparent; 
-            outline: none; 
-            font-size: 1rem; 
-            color: var(--text-main); 
-            font-weight: 500; 
-            font-family: inherit; 
-        }
+        .input-rename { width: 100%; padding: 12px 15px; border-radius: 12px; border: 2px solid #e2e8f0; font-size: 1rem; font-family: inherit; margin-bottom: 25px; outline: none; transition: 0.2s; color: var(--text-main); font-weight: 600; text-align: center; }
+        .input-rename:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); }
+
+        .modal-actions-kustom { display: flex; gap: 12px; }
+        .btn-batal-kustom { flex: 1; background: #f1f5f9; color: #475569; border: none; border-radius: 14px; padding: 14px; font-weight: 700; font-size: 0.95rem; cursor: pointer; transition: 0.2s; }
+        .btn-batal-kustom:hover { background: #e2e8f0; color: #1e293b; }
         
-        .chat-input::placeholder { 
-            color: #94a3b8; 
-        }
+        .btn-konfirmasi-kustom { flex: 1; background: #ef4444; color: #ffffff; border: none; border-radius: 14px; padding: 14px; font-weight: 700; font-size: 0.95rem; cursor: pointer; transition: 0.2s; box-shadow: 0 6px 20px rgba(239, 68, 68, 0.2); }
+        .btn-konfirmasi-kustom:hover { background: #dc2626; transform: translateY(-1px); box-shadow: 0 8px 25px rgba(239, 68, 68, 0.25); }
         
-        .btn-send { 
-            width: 44px; 
-            height: 44px; 
-            border-radius: 50%; 
-            background: var(--primary); 
-            color: white; 
-            border: none; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            cursor: pointer; 
-            transition: 0.2s; 
-            font-size: 1.1rem; 
-            flex-shrink: 0; 
-            box-shadow: 0 4px 15px rgba(99, 60, 245, 0.3); 
-        }
-        
-        .btn-send:hover { 
-            transform: scale(1.05); 
-        }
-        
-        .btn-send:disabled { 
-            background: #cbd5e1; 
-            cursor: not-allowed; 
-            transform: none; 
-            box-shadow: none; 
-        }
+        .btn-konfirmasi-biru { background: #3b82f6; box-shadow: 0 6px 20px rgba(59, 130, 246, 0.2); }
+        .btn-konfirmasi-biru:hover { background: #2563eb; box-shadow: 0 8px 25px rgba(59, 130, 246, 0.25); }
 
-        .modal-overlay-kustom {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(15, 23, 42, 0.4);
-            z-index: 99999;
-            justify-content: center;
-            align-items: center;
-            backdrop-filter: blur(8px);
-            transition: all 0.3s ease;
+        /* ====================================================
+           RESPONSIVE MOBILE (HP & TABLET KECIL) OVERRIDES 
+           ==================================================== */
+        @media (max-width: 991px) {
+            .chat-header { padding: 15px 20px; }
+            .ai-identity h2 { font-size: 1.15rem; }
+            .ai-avatar { width: 38px; height: 38px; font-size: 1.1rem; }
+            
+            /* Menghilangkan padding berlebih agar chat melebar full di HP */
+            .chat-messages { padding: 20px 15px; gap: 20px; }
+            .chat-input-wrapper { padding: 20px 15px; }
+            
+            .message-row { max-width: 95%; gap: 12px; }
+            .bubble { padding: 15px 20px; font-size: 0.95rem; }
+            .msg-avatar { width: 30px; height: 30px; font-size: 0.9rem; }
+            
+            #filePreviewContainer { max-width: 100%; font-size: 0.75rem; overflow: hidden; }
+            #fileNameDisplay { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block; max-width: 80%; }
+            
+            /* Agar tombol edit/delete tetap bisa ditekan di HP */
+            .history-actions { display: flex; } 
         }
-
-        .modal-box-kustom {
-            background: #ffffff;
-            width: 90%;
-            max-width: 400px;
-            border-radius: 24px;
-            padding: 35px 30px;
-            text-align: center;
-            box-shadow: 0 25px 70px rgba(15, 23, 42, 0.15);
-            border: 1px solid #f1f5f9;
-            animation: popUpScale 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
-
-        @keyframes popUpScale {
-            from { transform: scale(0.9) translateY(10px); opacity: 0; }
-            to { transform: scale(1) translateY(0); opacity: 1; }
-        }
-
-        .modal-icon-warning {
-            width: 60px;
-            height: 60px;
-            background: #fef2f2;
-            color: #ef4444;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.6rem;
-            margin: 0 auto 20px;
-        }
-
-        .modal-box-kustom h3 {
-            font-weight: 800;
-            color: #1e293b;
-            font-size: 1.35rem;
-            margin-bottom: 10px;
-        }
-
-        .modal-box-kustom p {
-            color: #64748b;
-            font-size: 0.95rem;
-            line-height: 1.5;
-            margin-bottom: 30px;
-            font-weight: 500;
-        }
-
-        .modal-actions-kustom {
-            display: flex;
-            gap: 12px;
-        }
-
-        .btn-batal-kustom {
-            flex: 1;
-            background: #f1f5f9;
-            color: #475569;
-            border: none;
-            border-radius: 14px;
-            padding: 14px;
-            font-weight: 700;
-            font-size: 0.95rem;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-        .btn-batal-kustom:hover {
-            background: #e2e8f0;
-            color: #1e293b;
-        }
-
-        .btn-konfirmasi-kustom {
-            flex: 1;
-            background: #ef4444;
-            color: #ffffff;
-            border: none;
-            border-radius: 14px;
-            padding: 14px;
-            font-weight: 700;
-            font-size: 0.95rem;
-            cursor: pointer;
-            transition: 0.2s;
-            box-shadow: 0 6px 20px rgba(239, 68, 68, 0.2);
-        }
-        .btn-konfirmasi-kustom:hover {
-            background: #dc2626;
-            transform: translateY(-1px);
-            box-shadow: 0 8px 25px rgba(239, 68, 68, 0.25);
-        }
-
     </style>
 </head>
 <body>
+
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
 
     <aside class="chat-sidebar" id="sidebarHistory">
         <button class="btn-new-chat" id="btnNewChat">
@@ -628,11 +329,17 @@
                 {% for sesi in riwayat_sesi %}
                     <div class="history-item-wrapper" id="session-wrapper-{{ sesi.id }}">
                         <a href="#" class="history-item" onclick="loadHistory('{{ sesi.id }}', this.parentNode)">
-                            <i class="fa-regular fa-message"></i> {{ sesi.judul_chat }}
+                            <i class="fa-regular fa-message"></i> 
+                            <span id="chat-title-{{ sesi.id }}">{{ sesi.judul_chat }}</span>
                         </a>
-                        <button class="btn-delete-session" onclick="hapusSesiChat('{{ sesi.id }}', event)" title="Hapus Percakapan">
-                            <i class="fa-solid fa-trash-can"></i>
-                        </button>
+                        <div class="history-actions">
+                            <button class="btn-action-session edit" onclick="bukaModalRename('{{ sesi.id }}', '{{ sesi.judul_chat|escapejs }}', event)" title="Ubah Nama">
+                                <i class="fa-solid fa-pen"></i>
+                            </button>
+                            <button class="btn-action-session delete" onclick="hapusSesiChat('{{ sesi.id }}', event)" title="Hapus Percakapan">
+                                <i class="fa-solid fa-trash-can"></i>
+                            </button>
+                        </div>
                     </div>
                 {% empty %}
                     <span id="emptyHistoryText" style="font-size: 0.85rem; color: #94a3b8; padding-left: 10px;">Belum ada riwayat percakapan.</span>
@@ -673,7 +380,7 @@
 
         <div class="chat-input-wrapper">
             <div id="filePreviewContainer" style="display: none; padding: 8px 15px; background: #e0e7ff; border-radius: 12px; margin-bottom: 10px; font-size: 0.85rem; font-weight: 600; color: #4f46e5; align-items: center; justify-content: space-between; width: fit-content; gap: 15px; border: 1px solid #c7d2fe;">
-                <span>
+                <span style="display: flex; align-items: center; max-width: 100%; overflow: hidden;">
                     <i class="fa-solid fa-file-lines me-2"></i> 
                     <span id="fileNameDisplay">nama_file.pdf</span>
                 </span>
@@ -712,6 +419,20 @@
                 </div>
             </div>
         </div>
+        
+        <div class="modal-overlay-kustom" id="modalRenameChat">
+            <div class="modal-box-kustom">
+                <div class="modal-icon-info">
+                    <i class="fa-solid fa-pen-to-square"></i>
+                </div>
+                <h3>Ubah Nama Chat</h3>
+                <input type="text" id="inputNamaBaru" class="input-rename" placeholder="Masukkan nama baru..." autocomplete="off">
+                <div class="modal-actions-kustom">
+                    <button type="button" class="btn-batal-kustom" onclick="tutupModalRename()">Batal</button>
+                    <button type="button" class="btn-konfirmasi-kustom btn-konfirmasi-biru" id="btnSetujuRename">Simpan Nama</button>
+                </div>
+            </div>
+        </div>
     </main>
 
     <script>
@@ -726,6 +447,7 @@
 
         const sidebar = document.getElementById('sidebarHistory');
         const btnToggle = document.getElementById('btnToggleSidebar');
+        const overlay = document.getElementById('sidebarOverlay');
         const chatContainer = document.getElementById('chatContainer');
         const chatForm = document.getElementById('chatForm');
         const chatInput = document.getElementById('chatInput');
@@ -749,13 +471,19 @@
             filePreviewContainer.style.display = 'none';
         }
 
-        // Sidebar Navigation Toggle
-        btnToggle.addEventListener('click', function() {
-            sidebar.classList.toggle('show');
+        // Toggle Sidebar Responsive
+        function toggleSidebar() {
+            if (window.innerWidth >= 992) {
+                sidebar.classList.toggle('collapsed');
+            } else {
+                sidebar.classList.toggle('show');
+                overlay.classList.toggle('active');
+            }
             btnToggle.classList.toggle('active');
-        });
+        }
 
-        // Clear view wrapper function
+        btnToggle.addEventListener('click', toggleSidebar);
+
         function triggerResetTampilan() {
             document.getElementById('chatHeaderTitle').innerText = "EIO AI";
             chatContainer.innerHTML = `
@@ -778,8 +506,9 @@
             document.querySelectorAll('.history-item-wrapper').forEach(el => el.classList.remove('active-session'));
             triggerResetTampilan();
             
-            if (window.innerWidth < 768) { 
+            if (window.innerWidth < 992) { 
                 sidebar.classList.remove('show'); 
+                overlay.classList.remove('active');
                 btnToggle.classList.remove('active'); 
             }
         });
@@ -790,8 +519,9 @@
             document.querySelectorAll('.history-item-wrapper').forEach(el => el.classList.remove('active-session'));
             wrapperElement.classList.add('active-session');
             
-            if (window.innerWidth < 768) { 
+            if (window.innerWidth < 992) { 
                 sidebar.classList.remove('show'); 
+                overlay.classList.remove('active');
                 btnToggle.classList.remove('active'); 
             }
 
@@ -841,33 +571,26 @@
             }
         }
 
-        // FUNGSI BARU: AJAX UNTUK MENGHAPUS SESI CHAT DARI SIDEBAR DAN DATABASE
-        // --- LOGIKA HANDLING MODAL HAPUS CHAT KUSTOM ---
+        // ==========================================
+        // LOGIK MODAL HAPUS CHAT
+        // ==========================================
         let sesiIdYangAkanDihapus = null;
 
         function hapusSesiChat(sesiId, event) {
-            event.stopPropagation(); // Mencegah terpicunya fungsi klik buka riwayat obrolan
-            
-            // Simpan ID sesi ke variabel global sementara untuk dieksekusi nanti
+            event.stopPropagation(); 
             sesiIdYangAkanDihapus = sesiId; 
-            
-            // Tampilkan modal kustom ke permukaan layar
-            const modal = document.getElementById('modalHapusChat');
-            modal.style.display = 'flex';
+            document.getElementById('modalHapusChat').style.display = 'flex';
         }
 
         function tutupModalHapusChat() {
-            const modal = document.getElementById('modalHapusChat');
-            modal.style.display = 'none';
-            sesiIdYangAkanDihapus = null; // Bersihkan memori ID pelacak
+            document.getElementById('modalHapusChat').style.display = 'none';
+            sesiIdYangAkanDihapus = null; 
         }
 
-        // EVENT LISTENER SAAT TOMBOL "HAPUS PERMANEN" DI DALAM MODAL DIKLIK
         document.getElementById('btnSetujuHapusChat').addEventListener('click', async function() {
             if (!sesiIdYangAkanDihapus) return;
-
             const sesiId = sesiIdYangAkanDihapus;
-            tutupModalHapusChat(); // Langsung tutup modal agar UX terasa instan cepat
+            tutupModalHapusChat(); 
 
             try {
                 const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
@@ -879,17 +602,14 @@
                 const data = await response.json();
 
                 if (data.status === 'success') {
-                    // Hilangkan elemen baris dari struktur dokumen HTML di sidebar
                     const targetWrapper = document.getElementById(`session-wrapper-${sesiId}`);
                     if (targetWrapper) targetWrapper.remove();
 
-                    // Reset kanvas ruang obrolan tengah jika sesi yang dihapus adalah sesi yang sedang aktif dibuka
                     if (currentSesiId == sesiId) {
                         currentSesiId = null;
                         triggerResetTampilan();
                     }
 
-                    // Validasi sisa baris riwayat obrolan di sidebar
                     const historyList = document.getElementById('historyList');
                     if (historyList.children.length === 0) {
                         historyList.innerHTML = `<span id="emptyHistoryText" style="font-size: 0.85rem; color: #94a3b8; padding-left: 10px;">Belum ada riwayat percakapan.</span>`;
@@ -900,6 +620,76 @@
             } catch (error) {
                 console.error("Delete Error:", error);
                 alert("Terjadi kesalahan jaringan saat mencoba menghapus.");
+            }
+        });
+
+        // ==========================================
+        // LOGIK MODAL RENAME CHAT
+        // ==========================================
+        let sesiIdYangAkanDirename = null;
+
+        function bukaModalRename(sesiId, currentName, event) {
+            event.stopPropagation(); // Mencegah klik masuk ke a href
+            sesiIdYangAkanDirename = sesiId;
+            document.getElementById('inputNamaBaru').value = currentName;
+            document.getElementById('modalRenameChat').style.display = 'flex';
+            document.getElementById('inputNamaBaru').focus();
+        }
+
+        function tutupModalRename() {
+            document.getElementById('modalRenameChat').style.display = 'none';
+            sesiIdYangAkanDirename = null;
+        }
+
+        document.getElementById('btnSetujuRename').addEventListener('click', async function() {
+            if (!sesiIdYangAkanDirename) return;
+            const namaBaru = document.getElementById('inputNamaBaru').value.trim();
+            
+            if (!namaBaru) {
+                alert("Nama chat tidak boleh kosong.");
+                return;
+            }
+
+            const sesiId = sesiIdYangAkanDirename;
+            const tombolSimpan = this;
+            tombolSimpan.disabled = true;
+            tombolSimpan.innerHTML = "Menyimpan...";
+
+            try {
+                const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+                const formData = new FormData();
+                formData.append('judul_baru', namaBaru);
+
+                const response = await fetch(`/chat/api/rename/${sesiId}/`, {
+                    method: 'POST',
+                    headers: { 'X-CSRFToken': csrfToken },
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (data.status === 'success') {
+                    // Update nama di sidebar
+                    document.getElementById(`chat-title-${sesiId}`).innerText = namaBaru;
+                    // Update judul header jika sedang dibuka
+                    if (currentSesiId == sesiId) {
+                        document.getElementById('chatHeaderTitle').innerText = namaBaru;
+                    }
+                    // Update attribut onClick di tombol rename agar datanya sinkron
+                    const wrapper = document.getElementById(`session-wrapper-${sesiId}`);
+                    const btnEdit = wrapper.querySelector('.btn-action-session.edit');
+                    btnEdit.setAttribute('onclick', `bukaModalRename('${sesiId}', '${namaBaru.replace(/'/g, "\\'")}', event)`);
+                    
+                    tutupModalRename();
+                } else {
+                    alert("Gagal merename percakapan: " + data.message);
+                }
+            } catch (error) {
+                console.error("Rename Error:", error);
+                alert("Terjadi kesalahan jaringan saat mencoba mengubah nama.");
+            } finally {
+                tombolSimpan.disabled = false;
+                tombolSimpan.innerHTML = "Simpan Nama";
             }
         });
 
@@ -988,7 +778,6 @@
                     if (!currentSesiId) {
                         currentSesiId = data.sesi_id;
                         
-                        // Buat elemen kosong penampung riwayat jika sebelumnya kosong melongpong
                         const emptyTxt = document.getElementById('emptyHistoryText');
                         if (emptyTxt) emptyTxt.remove();
 
@@ -996,11 +785,17 @@
                         const newItemHtml = `
                             <div class="history-item-wrapper active-session" id="session-wrapper-${data.sesi_id}">
                                 <a href="#" class="history-item" onclick="loadHistory('${data.sesi_id}', this.parentNode)">
-                                    <i class="fa-regular fa-message"></i> ${data.judul}
+                                    <i class="fa-regular fa-message"></i> 
+                                    <span id="chat-title-${data.sesi_id}">${data.judul}</span>
                                 </a>
-                                <button class="btn-delete-session" onclick="hapusSesiChat('${data.sesi_id}', event)" title="Hapus Percakapan">
-                                    <i class="fa-solid fa-trash-can"></i>
-                                </button>
+                                <div class="history-actions">
+                                    <button class="btn-action-session edit" onclick="bukaModalRename('${data.sesi_id}', '${data.judul.replace(/'/g, "\\'")}', event)" title="Ubah Nama">
+                                        <i class="fa-solid fa-pen"></i>
+                                    </button>
+                                    <button class="btn-action-session delete" onclick="hapusSesiChat('${data.sesi_id}', event)" title="Hapus Percakapan">
+                                        <i class="fa-solid fa-trash-can"></i>
+                                    </button>
+                                </div>
                             </div>
                         `;
                         historyList.insertAdjacentHTML('afterbegin', newItemHtml);
@@ -1095,11 +890,17 @@
                         const newItemHtml = `
                             <div class="history-item-wrapper active-session" id="session-wrapper-${data.sesi_id}">
                                 <a href="#" class="history-item" onclick="loadHistory('${data.sesi_id}', this.parentNode)">
-                                    <i class="fa-regular fa-message"></i> ${data.judul}
+                                    <i class="fa-regular fa-message"></i> 
+                                    <span id="chat-title-${data.sesi_id}">${data.judul}</span>
                                 </a>
-                                <button class="btn-delete-session" onclick="hapusSesiChat('${data.sesi_id}', event)" title="Hapus Percakapan">
-                                    <i class="fa-solid fa-trash-can"></i>
-                                </button>
+                                <div class="history-actions">
+                                    <button class="btn-action-session edit" onclick="bukaModalRename('${data.sesi_id}', '${data.judul.replace(/'/g, "\\'")}', event)" title="Ubah Nama">
+                                        <i class="fa-solid fa-pen"></i>
+                                    </button>
+                                    <button class="btn-action-session delete" onclick="hapusSesiChat('${data.sesi_id}', event)" title="Hapus Percakapan">
+                                        <i class="fa-solid fa-trash-can"></i>
+                                    </button>
+                                </div>
                             </div>
                         `;
                         historyList.insertAdjacentHTML('afterbegin', newItemHtml);

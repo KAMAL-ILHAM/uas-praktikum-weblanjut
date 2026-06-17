@@ -12,6 +12,16 @@
         justify-content: space-between; 
         align-items: center; 
         margin-bottom: 25px; 
+        flex-wrap: wrap;
+        gap: 15px;
+    }
+
+    .header-left {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        flex: 1;
+        min-width: 250px;
     }
     
     .btn-close-latihan { 
@@ -28,6 +38,7 @@
         cursor: pointer; 
         transition: 0.2s; 
         box-shadow: 0 2px 10px rgba(0,0,0,0.02); 
+        flex-shrink: 0;
     }
     
     .btn-close-latihan:hover { 
@@ -41,6 +52,7 @@
         font-weight: 800; 
         color: var(--text-main); 
         margin: 0; 
+        word-break: break-word;
     }
     
     .timer-badge { 
@@ -54,6 +66,7 @@
         display: flex; 
         align-items: center; 
         gap: 8px; 
+        white-space: nowrap;
     }
 
     @keyframes pulse {
@@ -181,6 +194,8 @@
         display: flex; 
         justify-content: space-between; 
         align-items: center; 
+        gap: 15px;
+        flex-wrap: wrap;
     }
     
     .btn-nav { 
@@ -192,8 +207,11 @@
         transition: 0.2s; 
         display: flex; 
         align-items: center; 
+        justify-content: center;
         gap: 10px; 
         border: none; 
+        flex: 1;
+        min-width: 140px;
     }
     
     .btn-prev { 
@@ -202,7 +220,7 @@
         border: 1px solid #e2e8f0; 
     }
     
-    .btn-prev:hover { 
+    .btn-prev:hover:not(:disabled) { 
         background: #f8fafc; 
         color: var(--text-main); 
     }
@@ -230,7 +248,7 @@
         display: none; 
     }
     
-    .btn-finish-quiz:hover { 
+    .btn-finish-quiz:hover:not(:disabled) { 
         transform: translateY(-2px); 
         box-shadow: 0 8px 20px rgba(16, 185, 129, 0.35); 
     }
@@ -265,6 +283,7 @@
         display: flex; 
         align-items: center; 
         gap: 30px; 
+        flex-wrap: wrap;
     }
     
     .score-circle-purple { 
@@ -282,6 +301,11 @@
         box-shadow: 0 10px 30px rgba(99, 60, 245, 0.2); 
     }
     
+    .summary-text {
+        flex: 1;
+        min-width: 200px;
+    }
+
     .summary-text h2 { 
         margin: 0 0 8px 0; 
         font-size: 1.6rem; 
@@ -333,6 +357,8 @@
         justify-content: space-between; 
         align-items: center; 
         margin-bottom: 20px; 
+        flex-wrap: wrap;
+        gap: 10px;
     }
     
     .badge-soal { 
@@ -351,6 +377,9 @@
         border-radius: 50px; 
         background: #ecfdf5; 
         color: #10b981; 
+        display: flex;
+        align-items: center;
+        gap: 5px;
     }
     
     .review-question { 
@@ -439,13 +468,98 @@
         box-shadow: 0 8px 20px rgba(0,0,0,0.05); 
         color: var(--text-main); 
     }
+
+    /* ========================================= */
+    /* MEDIA QUERIES (UNTUK RESPONSIVITAS)       */
+    /* ========================================= */
+    @media (max-width: 768px) {
+        .latihan-header {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .header-left {
+            width: 100%;
+        }
+
+        .timer-badge {
+            width: 100%;
+            justify-content: center;
+            padding: 12px;
+        }
+
+        .question-card {
+            padding: 25px 20px;
+        }
+
+        .badge-question {
+            left: 20px;
+            font-size: 0.7rem;
+            padding: 5px 12px;
+        }
+
+        .question-text {
+            font-size: 1.1rem;
+        }
+
+        .essay-textarea {
+            height: 220px; /* Diperkecil agar area form tidak memakan seluruh layar HP */
+            padding: 15px;
+            font-size: 1rem;
+        }
+
+        .nav-buttons {
+            flex-direction: column-reverse; /* Tombol "Selanjutnya/Kirim" berada di atas "Sebelumnya" di mobile */
+        }
+
+        .btn-nav, .btn-finish-quiz {
+            width: 100%;
+            padding: 16px;
+        }
+
+        .result-summary-card {
+            flex-direction: column;
+            text-align: center;
+            padding: 30px 20px;
+            gap: 20px;
+        }
+
+        .score-circle-purple {
+            width: 90px;
+            height: 90px;
+            font-size: 2rem;
+            border-width: 5px;
+        }
+
+        .summary-text h2 {
+            font-size: 1.4rem;
+        }
+
+        .review-item {
+            padding: 20px;
+        }
+
+        .review-item-header {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .badge-soal, .badge-nilai {
+            width: 100%;
+            justify-content: center;
+        }
+
+        .answer-box-user, .ai-note-box {
+            padding: 15px;
+        }
+    }
 </style>
 {% endblock %}
 
 {% block content %}
 <div id="quiz-view">
     <div class="latihan-header">
-        <div class="d-flex align-items-center gap-3">
+        <div class="header-left">
             <button class="btn-close-latihan" onclick="window.location.href=`{% url 'users:dashboard' %}`">
                 <i class="fa-solid fa-xmark"></i>
             </button>
@@ -489,7 +603,7 @@
 
 <div id="result-view">
     <div class="latihan-header">
-        <div class="d-flex align-items-center gap-3">
+        <div class="header-left">
             <button class="btn-close-latihan" onclick="location.reload()">
                 <i class="fa-solid fa-rotate-right"></i>
             </button>

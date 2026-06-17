@@ -22,8 +22,8 @@ urlpatterns = [
         auth_views.PasswordResetView.as_view(
             template_name="users/reset_password.html", 
             success_url='/auth/reset_password_sent/',
-            email_template_name="users/password_reset_email.txt",      # <- Ubah jadi .txt (opsional tapi disarankan)
-            html_email_template_name="users/password_reset_email.html", # <- TAMBAHKAN BARIS INI!
+            email_template_name="users/password_reset_email.txt",      
+            html_email_template_name="users/password_reset_email.html", 
             subject_template_name="users/password_reset_subject.txt"
         ), 
         name="reset_password"

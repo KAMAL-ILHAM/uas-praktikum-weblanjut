@@ -2,271 +2,328 @@
 
 {% block extra_style %}
 <style>
-    /* Daftar Materi */
-    .materi-grid { 
-        display: grid; 
-        grid-template-columns: repeat(auto-fill, minmax(400px, 1fr)); 
-        gap: 25px; 
+    /* Daftar Materi & Tugas */
+    .materi-grid, .tugas-grid {
+        display: grid;
+        grid-template-columns: 1fr; /* Default 1 kolom untuk HP */
+        gap: 20px;
     }
-    .materi-card { 
-        background: white; 
-        border-radius: 25px; 
-        padding: 25px; 
-        box-shadow: 0 10px 30px rgba(0,0,0,0.03); 
-        border: 1px solid #f8fafc; 
-        transition: transform 0.2s ease, box-shadow 0.2s ease; 
+
+    /* Media Query untuk Desktop / Tablet */
+    @media (min-width: 768px) {
+        .materi-grid, .tugas-grid {
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); /* 300px lebih aman untuk tablet */
+            gap: 25px;
+        }
     }
-    .materi-card:hover { 
-        transform: translateY(-5px); 
-        box-shadow: 0 15px 35px rgba(0,0,0,0.05); 
+
+    .materi-card {
+        background: white;
+        border-radius: 25px;
+        padding: 25px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.03);
+        border: 1px solid #f8fafc;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        display: flex;
+        flex-direction: column;
+        height: 100%;
     }
-    .badge-materi { 
-        font-size: 0.7rem; 
-        font-weight: 800; 
-        padding: 6px 12px; 
-        border-radius: 8px; 
+    .materi-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 35px rgba(0,0,0,0.05);
+    }
+    .badge-materi {
+        font-size: 0.7rem;
+        font-weight: 800;
+        padding: 6px 12px;
+        border-radius: 8px;
     }
     .badge-pdf { background: #fff1f2; color: #ef4444; }
     .badge-doc { background: #f0f9ff; color: #0ea5e9; }
-    .card-title { 
-        color: #1e293b; 
-        font-size: 1.15rem; 
-        font-weight: 800; 
-        margin: 15px 0 5px; 
-        white-space: nowrap; 
-        overflow: hidden; 
-        text-overflow: ellipsis; 
+    .card-title {
+        color: #1e293b;
+        font-size: 1.15rem;
+        font-weight: 800;
+        margin: 15px 0 5px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
 
-    .card-subtitle { 
-        color: #64748b; 
+    .card-subtitle {
+        color: #64748b;
         font-size: 0.85rem;
         display: -webkit-box;
         display: box;
         line-clamp: 2;
         -webkit-line-clamp: 2;
         -webkit-box-orient: vertical;
-        overflow: hidden; 
+        overflow: hidden;
+        flex-grow: 1;
     }
 
-    .card-footer { 
-        display: flex; 
-        justify-content: space-between; 
-        align-items: center; 
-        margin-top: 20px; 
-        padding-top: 15px; 
-        border-top: 1px solid #f1f5f9; 
+    .card-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 20px;
+        padding-top: 15px;
+        border-top: 1px solid #f1f5f9;
     }
-    .footer-icons { 
-        display: flex; 
-        gap: 15px; 
-        color: #94a3b8; 
-        font-size: 1.1rem; 
+    .footer-icons {
+        display: flex;
+        gap: 15px;
+        color: #94a3b8;
+        font-size: 1.1rem;
     }
-    .footer-icons a, .footer-icons button { 
-        color: inherit; 
-        transition: color 0.2s; 
-        background: none; 
-        border: none; 
-        padding: 0; 
-        cursor: pointer; 
+    .footer-icons a, .footer-icons button {
+        color: inherit;
+        transition: color 0.2s;
+        background: none;
+        border: none;
+        padding: 0;
+        cursor: pointer;
     }
     .footer-icons a:hover { color: var(--primary); }
     .icon-trash { color: #fecaca; transition: 0.2s; }
     .icon-trash:hover { color: #ef4444; }
-    .btn-latihan { 
-        background: #f5f3ff; 
-        color: #633cf5; 
-        border: none; 
-        padding: 8px 18px; 
-        border-radius: 12px; 
-        font-weight: 700; 
-        font-size: 0.85rem; 
-        text-decoration: none; 
-        display: flex; 
-        align-items: center; 
-        gap: 8px; 
-        transition: 0.2s; 
+    .btn-latihan {
+        background: #f5f3ff;
+        color: #633cf5;
+        border: none;
+        padding: 8px 18px;
+        border-radius: 12px;
+        font-weight: 700;
+        font-size: 0.85rem;
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        transition: 0.2s;
     }
     .btn-latihan:hover { background: #e0d4fc; }
-    .btn-tambah { 
-        background: #633cf5; 
-        color: white; 
-        padding: 10px 20px; 
-        border-radius: 12px; 
-        font-weight: 700; 
-        font-size: 0.85rem; 
-        text-decoration: none; 
-        display: inline-flex; 
-        align-items: center; 
-        gap: 8px; 
-        white-space: nowrap; 
-        transition: all 0.3s ease; 
+    .btn-tambah {
+        background: #633cf5;
+        color: white;
+        padding: 10px 20px;
+        border-radius: 12px;
+        font-weight: 700;
+        font-size: 0.85rem;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        white-space: nowrap;
+        transition: all 0.3s ease;
     }
     .btn-tambah:hover { background: #4f2cdb; color: white; }
 
-    /* Daftar Tugas */
-    .tugas-grid { 
-        display: grid; 
-        grid-template-columns: repeat(auto-fill, minmax(400px, 1fr)); 
-        gap: 25px; 
+    .tugas-card {
+        background: white;
+        border-radius: 20px;
+        padding: 25px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.03);
+        border: 1px solid #f8fafc;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        display: flex;
+        flex-direction: column;
+        height: 100%;
     }
-    .tugas-card { 
-        background: white; 
-        border-radius: 20px; 
-        padding: 25px; 
-        box-shadow: 0 10px 30px rgba(0,0,0,0.03); 
-        border: 1px solid #f8fafc; 
-        transition: transform 0.2s ease, box-shadow 0.2s ease; 
+    .tugas-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 35px rgba(0,0,0,0.05);
     }
-    .tugas-card:hover { 
-        transform: translateY(-5px); 
-        box-shadow: 0 15px 35px rgba(0,0,0,0.05); 
-    }
-    .badge-tugas { 
-        font-size: 0.75rem; 
-        font-weight: 800; 
-        padding: 6px 14px; 
-        border-radius: 8px; 
-        text-transform: uppercase; 
+    .badge-tugas {
+        font-size: 0.75rem;
+        font-weight: 800;
+        padding: 6px 14px;
+        border-radius: 8px;
+        text-transform: uppercase;
         letter-spacing: 0.5px;
     }
     .badge-mudah { background: #fce7f3; color: #db2777; }
     .badge-sedang { background: #fef3c7; color: #d97706; }
     .badge-sulit { background: #e0e7ff; color: #4f46e5; }
-    .waktu-sisa { 
-        font-size: 0.85rem; 
-        font-weight: 700; 
-        display: flex; 
-        align-items: center; 
-        gap: 5px; 
+    .waktu-sisa {
+        font-size: 0.85rem;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 5px;
     }
     .text-urgent { color: #ef4444; }
     .text-aman { color: #d97706; }
 
-    .card-desc { 
-        color: #64748b; 
-        font-size: 0.9rem; 
+    .card-desc {
+        color: #64748b;
+        font-size: 0.9rem;
         line-height: 1.6;
-
         display: -webkit-box;
         display: box;
-
         line-clamp: 2;
         -webkit-line-clamp: 2;
-
         -webkit-box-orient: vertical;
         overflow: hidden;
+        flex-grow: 1;
     }
-    .card-footer-tugas { 
-        display: flex; 
-        justify-content: space-between; 
-        align-items: center; 
-        margin-top: 20px; 
-        padding-top: 20px; 
-        border-top: 1px solid #f1f5f9; 
+    .card-footer-tugas {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 20px;
+        padding-top: 20px;
+        border-top: 1px solid #f1f5f9;
     }
-    .btn-selesai { 
-        background: #ecfdf5; 
-        color: #10b981; 
-        border: none; 
-        padding: 8px 16px; 
-        border-radius: 12px; 
-        font-weight: 700; 
-        font-size: 0.85rem; 
-        cursor: pointer; 
-        display: flex; 
-        align-items: center; 
-        gap: 8px; 
-        transition: all 0.3s ease; 
+    .btn-selesai {
+        background: #ecfdf5;
+        color: #10b981;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 12px;
+        font-weight: 700;
+        font-size: 0.85rem;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.3s ease;
     }
     .btn-selesai:hover { background: #d1fae5; color: #059669; }
-    .icon-lampiran { 
-        color: #cbd5e1; 
-        font-size: 1.2rem; 
-        cursor: pointer; 
-        transition: 0.2s; 
-        background: none; 
-        border: none; 
+    .icon-lampiran {
+        color: #cbd5e1;
+        font-size: 1.2rem;
+        cursor: pointer;
+        transition: 0.2s;
+        background: none;
+        border: none;
         padding: 5px;
     }
     .icon-lampiran.has-file { color: var(--primary); }
     .icon-lampiran:hover { color: #1e293b; transform: scale(1.1); }
 
     /* Modal Styling */
-    .modal-overlay-force { 
-        display: none; 
-        position: fixed !important; 
-        top: 0 !important; 
-        left: 0 !important; 
-        width: 100vw !important; 
-        height: 100vh !important; 
-        background: rgba(15, 23, 42, 0.6) !important; 
-        z-index: 999999 !important; 
-        justify-content: center !important; 
-        align-items: center !important; 
-        backdrop-filter: blur(4px) !important; 
+    .modal-overlay-force {
+        display: none;
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        width: 100vw !important;
+        height: 100vh !important;
+        background: rgba(15, 23, 42, 0.6) !important;
+        z-index: 999999 !important;
+        justify-content: center !important;
+        align-items: center !important;
+        backdrop-filter: blur(4px) !important;
     }
-    .modal-box-force { 
-        background: white !important; 
-        width: 90% !important; 
-        max-width: 450px !important; 
-        border-radius: 24px !important; 
-        padding: 40px 30px !important; 
-        position: relative !important; 
-        box-shadow: 0 20px 50px rgba(0,0,0,0.2) !important; 
-        text-align: center !important; 
-        animation: slideUpForce 0.3s ease; 
+    .modal-box-force {
+        background: white !important;
+        width: 90% !important;
+        max-width: 450px !important;
+        border-radius: 24px !important;
+        padding: 40px 30px !important;
+        position: relative !important;
+        box-shadow: 0 20px 50px rgba(0,0,0,0.2) !important;
+        text-align: center !important;
+        animation: slideUpForce 0.3s ease;
     }
-    @keyframes slideUpForce { 
-        from { transform: translateY(30px); opacity: 0; } 
-        to { transform: translateY(0); opacity: 1; } 
+    @keyframes slideUpForce {
+        from { transform: translateY(30px); opacity: 0; }
+        to { transform: translateY(0); opacity: 1; }
     }
-    .modal-close-force { 
-        position: absolute !important; 
-        top: 20px !important; 
-        right: 20px !important; 
-        background: #f1f5f9 !important; 
-        border: none !important; 
-        width: 35px !important; 
-        height: 35px !important; 
-        border-radius: 50% !important; 
-        color: #64748b !important; 
-        cursor: pointer !important; 
-        transition: 0.2s !important; 
-        display: flex !important; 
-        align-items: center !important; 
-        justify-content: center !important; 
+    .modal-close-force {
+        position: absolute !important;
+        top: 20px !important;
+        right: 20px !important;
+        background: #f1f5f9 !important;
+        border: none !important;
+        width: 35px !important;
+        height: 35px !important;
+        border-radius: 50% !important;
+        color: #64748b !important;
+        cursor: pointer !important;
+        transition: 0.2s !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
     }
     .modal-close-force:hover { background: #fee2e2 !important; color: #ef4444 !important; }
-    .icon-circle-large { 
-        font-size: 3.5rem; 
-        margin-bottom: 15px; 
-        width: 90px; 
-        height: 90px; 
-        display: inline-flex; 
-        align-items: center; 
-        justify-content: center; 
-        border-radius: 50%; 
-        margin-left: auto; 
+    .icon-circle-large {
+        font-size: 3.5rem;
+        margin-bottom: 15px;
+        width: 90px;
+        height: 90px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        margin-left: auto;
         margin-right: auto;
     }
-    .icon-warning-large { 
-        font-size: 4rem; 
-        color: #ef4444; 
-        margin-bottom: 15px; 
-        background: #fef2f2; 
-        width: 100px; 
-        height: 100px; 
-        display: inline-flex; 
-        align-items: center; 
-        justify-content: center; 
-        border-radius: 50%; 
-        margin-left: auto; 
+    .icon-warning-large {
+        font-size: 4rem;
+        color: #ef4444;
+        margin-bottom: 15px;
+        background: #fef2f2;
+        width: 100px;
+        height: 100px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        margin-left: auto;
         margin-right: auto;
     }
     .bg-green-soft { background: #ecfdf5; color: #10b981; }
     .bg-blue-soft { background: #eff6ff; color: #0ea5e9; }
+
+    /* =========================================
+       PERBAIKAN RESPONSIVE KHUSUS MOBILE (HP) 
+       ========================================= */
+    @media (max-width: 767px) {
+        .actions-bar {
+            flex-direction: column !important;
+            align-items: stretch !important;
+            gap: 15px;
+        }
+        .actions-bar > .d-flex {
+            flex-direction: column !important;
+            align-items: stretch !important;
+            width: 100%;
+            gap: 10px !important;
+        }
+        #filterMateriForm, #filterTugasForm {
+            flex-direction: column !important;
+            width: 100%;
+            gap: 10px;
+        }
+        #filterMateriForm select, #filterTugasForm select {
+            width: 100% !important;
+            min-width: 100% !important;
+            margin: 0 !important;
+        }
+        .btn-tambah {
+            width: 100%;
+            justify-content: center;
+        }
+        .card-footer, .card-footer-tugas {
+            flex-direction: column;
+            gap: 15px;
+            align-items: stretch;
+            text-align: center;
+        }
+        .footer-icons {
+            justify-content: space-evenly;
+            padding-bottom: 15px;
+            border-bottom: 1px dashed #e2e8f0;
+        }
+        .btn-latihan, .btn-selesai {
+            width: 100%;
+            justify-content: center;
+        }
+        .card-footer-tugas {
+            flex-direction: column-reverse; /* Tombol selesai di atas, icon lampiran di bawah */
+        }
+    }
 </style>
 {% endblock %}
 
@@ -278,18 +335,21 @@
 
 <div class="actions-bar">
     <div class="tabs-container">
-        <a href="?active_tab=materi" class="tab-link {% if active_tab == 'materi' %}active{% endif %}">Daftar Materi</a>
+        <a href="?active_tab=materi" class="tab-link {% if active_tab == 'materi' or not active_tab %}active{% endif %}">Daftar Materi</a>
         <a href="?active_tab=tugas" class="tab-link {% if active_tab == 'tugas' %}active{% endif %}">Daftar Tugas</a>
     </div>
-    
+
     <div class="d-flex gap-2 align-items-center">
-        <form method="GET" action="{% url 'users:dashboard' %}" id="filterMateriForm" {% if active_tab == 'materi' %}style="display: flex !important;"{% else %}style="display: none !important;"{% endif %}>
-            <select name="type" class="form-select border-0 shadow-sm me-2" style="border-radius: 12px; font-size: 0.85rem; font-weight: 600; padding: 10px 40px 10px 15px; min-width: 160px; width: auto; cursor: pointer;" onchange="this.form.submit();">                
+        <form method="GET" action="{% url 'users:dashboard' %}" id="filterMateriForm" {% if active_tab == 'materi' or not active_tab %}style="display: flex !important;"{% else %}style="display: none !important;"{% endif %}>
+            <input type="hidden" name="active_tab" value="materi">
+
+            <select name="type" class="form-select border-0 shadow-sm me-2" style="border-radius: 12px; font-size: 0.85rem; font-weight: 600; padding: 10px 40px 10px 15px; min-width: 160px; width: auto; cursor: pointer;" onchange="this.form.submit();">
                 <option value="all">Semua Format</option>
                 <option value="pdf" {% if request.GET.type == 'pdf' %}selected{% endif %}>PDF</option>
                 <option value="doc" {% if request.GET.type == 'doc' %}selected{% endif %}>Word</option>
                 <option value="ppt" {% if request.GET.type == 'ppt' %}selected{% endif %}>PowerPoint</option>
             </select>
+            
             <select name="sort" class="form-select border-0 shadow-sm" style="border-radius: 12px; font-size: 0.85rem; font-weight: 600; padding: 10px 35px 10px 15px; cursor: pointer;" onchange="this.form.submit();">
                 <option value="terbaru" {% if request.GET.sort == 'terbaru' or not request.GET.sort %}selected{% endif %}>Terbaru</option>
                 <option value="terlama" {% if request.GET.sort == 'terlama' %}selected{% endif %}>Terlama</option>
@@ -298,28 +358,30 @@
 
         <form method="GET" action="{% url 'users:dashboard' %}" id="filterTugasForm" {% if active_tab == 'tugas' %}style="display: flex !important;"{% else %}style="display: none !important;"{% endif %}>
             <input type="hidden" name="active_tab" value="tugas">
-            <select name="type" class="form-select border-0 shadow-sm me-2" style="border-radius: 12px; font-size: 0.85rem; font-weight: 600; padding: 10px 40px 10px 15px; min-width: 160px; width: auto; cursor: pointer;" onchange="this.form.submit();">
-                <option value="all">Semua Tugas</option>
+
+            <select name="difficulty" class="form-select border-0 shadow-sm me-2" style="border-radius: 12px; font-size: 0.85rem; font-weight: 600; padding: 10px 40px 10px 15px; min-width: 160px; width: auto; cursor: pointer;" onchange="this.form.submit();">
+                <option value="all" {% if not request.GET.difficulty or request.GET.difficulty == 'all' %}selected{% endif %}>Semua Tugas</option>
                 <option value="Mudah" {% if request.GET.difficulty == 'Mudah' %}selected{% endif %}>Assignment</option>
                 <option value="Sedang" {% if request.GET.difficulty == 'Sedang' %}selected{% endif %}>Quiz / Lab</option>
                 <option value="Sulit" {% if request.GET.difficulty == 'Sulit' %}selected{% endif %}>Project</option>
             </select>
+
             <select name="sort_tugas" class="form-select border-0 shadow-sm" style="border-radius: 12px; font-size: 0.85rem; font-weight: 600; padding: 10px 35px 10px 15px; cursor: pointer;" onchange="this.form.submit();">
                 <option value="terdekat" {% if request.GET.sort_tugas == 'terdekat' or not request.GET.sort_tugas %}selected{% endif %}>Terdekat</option>
                 <option value="terjauh" {% if request.GET.sort_tugas == 'terjauh' %}selected{% endif %}>Terjauh</option>
             </select>
         </form>
-        
+
         <a href="{% url 'tasks:task_list' %}" id="btnArsip" class="btn-tambah" {% if active_tab == 'tugas' %}style="background: #1e293b; display: inline-flex;"{% else %}style="background: #1e293b; display: none;"{% endif %}>
             <i class="fa-solid fa-calendar-days"></i> Arsip
         </a>
         <a href="{% if active_tab == 'materi' %}{% url 'documents:upload' %}{% else %}{% url 'tasks:task_list' %}{% endif %}" id="btnAction" class="btn-tambah">
-            <i class="fa-solid fa-plus"></i> {% if active_tab == 'materi' %}Tambah Dokumen{% else %}Tambah Tugas{% endif %}
+            <i class="fa-solid fa-plus"></i> {% if active_tab == 'materi' or not active_tab %}Tambah Dokumen{% else %}Tambah Tugas{% endif %}
         </a>
     </div>
 </div>
 
-<div id="paneMateri" {% if active_tab == 'materi' %}style="display: block;"{% else %}style="display: none;"{% endif %}>
+<div id="paneMateri" {% if active_tab == 'materi' or not active_tab %}style="display: block;"{% else %}style="display: none;"{% endif %}>
     <div class="materi-grid">
         {% for dokumen in dokumen_terbaru %}
         <div class="materi-card">
@@ -335,15 +397,15 @@
                 {% endif %}
                 <small class="text-muted fw-bold">{{ dokumen.tanggal_unggah|date:"d M Y" }}</small>
             </div>
-            
+
             <div class="card-title" title="{{ dokumen.judul_modul }}">{{ dokumen.judul_modul }}</div>
             <p class="card-subtitle" title="{{ dokumen.deskripsi_singkat }}">{{ dokumen.deskripsi_singkat|default:"Dokumen Pembelajaran" }}</p>
-            
+
             <div class="card-footer">
                 <div class="footer-icons">
                     <a href="{% url 'documents:detail' dokumen.id %}" title="Baca Materi"><i class="fa-solid fa-book-open"></i></a>
                     <a href="{% url 'chat:chat_view' %}?doc_id={{ dokumen.id }}" title="Chat dengan AI"><i class="fa-solid fa-comment-dots"></i></a>
-                    
+
                     <button type="button" title="Hapus Dokumen" onclick="bukaModalHapus('{{ dokumen.id }}', '{{ dokumen.judul_modul|escapejs }}')">
                         <i class="fa-solid fa-trash icon-trash"></i>
                     </button>
@@ -387,19 +449,19 @@
                 {% endif %}
                 {% if request.user.is_pengingat_aktif %}
                     <div class="mt-3">
-                        <a href="{% url 'tasks:set_pengingat_1_jam' tugas.id %}" 
-                        class="btn btn-sm btn-outline-primary" 
-                        style="border-radius: 8px; padding: 6px 12px;" 
+                        <a href="{% url 'tasks:set_pengingat_1_jam' tugas.id %}"
+                        class="btn btn-sm btn-outline-primary"
+                        style="border-radius: 8px; padding: 6px 12px;"
                         title="Ingatkan dalam 1 jam">
                             <i class="fa-solid fa-bell"></i>
                         </a>
                     </div>
                 {% endif %}
             </div>
-            
+
             <div class="card-title" title="{{ tugas.nama_tugas }}">{{ tugas.nama_tugas }}</div>
             <p class="card-desc" title="{{ tugas.catatan }}">{{ tugas.catatan|default:"Tidak ada detail tambahan." }}</p>
-            
+
             <div class="card-footer-tugas">
                 {% if tugas.lampiran_gambar %}
                     <button type="button" class="icon-lampiran has-file" title="Lihat Lampiran" onclick="bukaModalLampiran('{{ tugas.lampiran_gambar.url }}', '{{ tugas.nama_tugas|escapejs }}')">
@@ -410,7 +472,7 @@
                         <i class="fa-solid fa-file-lines"></i>
                     </button>
                 {% endif %}
-                
+
                 <button type="button" class="btn-selesai" onclick="bukaModalSelesai('{{ tugas.id }}', '{{ tugas.nama_tugas|escapejs }}')">
                     Tandai Selesai <i class="fa-solid fa-check"></i>
                 </button>
@@ -434,7 +496,7 @@
         <div class="icon-warning-large"><i class="fa-solid fa-triangle-exclamation"></i></div>
         <h3 style="font-weight: 800; color: #1e293b; margin-bottom: 10px;">Yakin Ingin Menghapus?</h3>
         <p style="color: #64748b; font-size: 0.95rem; margin-bottom: 30px;"><strong id="hapusDocName" style="color: #ef4444;"></strong> akan dihapus permanen.</p>
-        
+
         <div style="display: flex; gap: 15px;">
             <button type="button" onclick="tutupModalHapus()" style="flex: 1; background: #f1f5f9; color: #475569; border: none; border-radius: 12px; padding: 14px; font-weight: 800; cursor: pointer;">
                 Batal
@@ -455,7 +517,7 @@
         <div class="icon-circle-large bg-green-soft"><i class="fa-solid fa-check-double"></i></div>
         <h3 style="font-weight: 800; color: #1e293b; margin-bottom: 10px;">Tugas Selesai?</h3>
         <p style="color: #64748b; font-size: 0.95rem; margin-bottom: 30px;">Tandai <strong id="selesaiTaskName" style="color: #10b981;"></strong> sebagai selesai?</p>
-        
+
         <div style="display: flex; gap: 15px;">
             <button type="button" onclick="tutupModalSelesai()" style="flex: 1; background: #f1f5f9; color: #475569; border: none; border-radius: 12px; padding: 14px; font-weight: 800; cursor: pointer;">
                 Batal
@@ -474,7 +536,7 @@
     <div class="modal-box-force" style="max-width: 600px !important;">
         <button class="modal-close-force" onclick="tutupModalLampiran()"><i class="fa-solid fa-xmark"></i></button>
         <h4 id="lampiranTitle" style="font-weight: 800; color: #1e293b; margin-bottom: 20px; text-align: left;">Lampiran Tugas</h4>
-        
+
         <div style="width: 100%; border-radius: 12px; overflow: hidden; border: 1px solid #e2e8f0; background: #f8fafc;">
             <img id="gambarLampiran" src="" style="width: 100%; height: auto; display: block; object-fit: contain; max-height: 60vh;">
         </div>
@@ -500,11 +562,11 @@
     function showTab(type) {
         const paneMateri = document.getElementById('paneMateri');
         const paneTugas = document.getElementById('paneTugas');
-        const linkMateri = document.getElementById('linkMateri');
-        const linkTugas = document.getElementById('linkTugas');
+        const linkMateri = document.querySelector('a[href="?active_tab=materi"]');
+        const linkTugas = document.querySelector('a[href="?active_tab=tugas"]');
         const btnAction = document.getElementById('btnAction');
         const btnArsip = document.getElementById('btnArsip');
-        
+
         const filterMateri = document.getElementById('filterMateriForm');
         const filterTugas = document.getElementById('filterTugasForm');
 
@@ -513,7 +575,7 @@
             paneTugas.style.display = 'none';
             if(linkMateri) linkMateri.classList.add('active');
             if(linkTugas) linkTugas.classList.remove('active');
-            
+
             filterMateri.style.setProperty('display', 'flex', 'important');
             filterTugas.style.setProperty('display', 'none', 'important');
 
@@ -533,7 +595,7 @@
 
             if(btnAction) {
                 btnAction.innerHTML = '<i class="fa-solid fa-plus"></i> Tambah Tugas';
-                btnAction.href = "{% url 'tasks:task_list' %}"; 
+                btnAction.href = "{% url 'tasks:task_list' %}";
             }
             if(btnArsip) btnArsip.style.display = 'inline-flex';
         }
@@ -542,7 +604,7 @@
     // Auto-load tab aktif berdasarkan URL parameter saat halaman dimuat
     document.addEventListener('DOMContentLoaded', function() {
         const urlParams = new URLSearchParams(window.location.search);
-        
+
         if (urlParams.get('active_tab') === 'tugas') {
             showTab('tugas');
         } else {
@@ -556,9 +618,9 @@
         document.getElementById('formHapusDokumen').action = `/documents/hapus/${docId}/`;
         document.getElementById('modalHapus').style.display = 'flex';
     }
-    
-    function tutupModalHapus() { 
-        document.getElementById('modalHapus').style.display = 'none'; 
+
+    function tutupModalHapus() {
+        document.getElementById('modalHapus').style.display = 'none';
     }
 
     // Manajemen Modal - Tandai Tugas Selesai
@@ -567,9 +629,9 @@
         document.getElementById('formSelesaiTugas').action = `/tasks/selesai/${taskId}/`;
         document.getElementById('modalSelesai').style.display = 'flex';
     }
-    
-    function tutupModalSelesai() { 
-        document.getElementById('modalSelesai').style.display = 'none'; 
+
+    function tutupModalSelesai() {
+        document.getElementById('modalSelesai').style.display = 'none';
     }
 
     // Manajemen Modal - Tampilan Lampiran Tugas
@@ -579,18 +641,18 @@
         document.getElementById('btnDownloadLampiran').href = urlGambar;
         document.getElementById('modalLampiran').style.display = 'flex';
     }
-    
-    function tutupModalLampiran() { 
+
+    function tutupModalLampiran() {
         document.getElementById('modalLampiran').style.display = 'none';
         setTimeout(() => { document.getElementById('gambarLampiran').src = ""; }, 300);
     }
-    
-    function bukaModalLampiranKosong() { 
-        document.getElementById('modalLampiranKosong').style.display = 'flex'; 
+
+    function bukaModalLampiranKosong() {
+        document.getElementById('modalLampiranKosong').style.display = 'flex';
     }
-    
-    function tutupModalLampiranKosong() { 
-        document.getElementById('modalLampiranKosong').style.display = 'none'; 
+
+    function tutupModalLampiranKosong() {
+        document.getElementById('modalLampiranKosong').style.display = 'none';
     }
 </script>
 {% endblock %}

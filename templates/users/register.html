@@ -6,12 +6,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Register - EIO Master</title>
     
-    <!-- Bootstrap 5 & Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     
     <style>
-        /* Base Layout */
+        /* ========================================= */
+        /* BASE LAYOUT & TYPOGRAPHY                  */
+        /* ========================================= */
         body { 
             margin: 0; 
             padding: 0; 
@@ -24,11 +25,12 @@
             background: white; 
             width: 100%; 
             min-height: 100vh; 
-            border-radius: 0; 
-            box-shadow: none; 
+            margin: 0; 
         }
 
-        /* Left Sidebar: Branding */
+        /* ========================================= */
+        /* LEFT SIDEBAR: BRANDING                    */
+        /* ========================================= */
         .bg-purple-gradient { 
             background: linear-gradient(135deg, #7c5cff, #6441f1); 
             color: white; 
@@ -57,21 +59,42 @@
             opacity: 0.9; 
         }
 
-        /* Right Sidebar: Form Section */
+        /* ========================================= */
+        /* RIGHT SIDEBAR: FORM SECTION               */
+        /* ========================================= */
         .form-section { 
             padding: 3rem 4rem; 
             display: flex; 
             flex-direction: column; 
-            justify-content: center; 
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        /* Mobile Logo Title (Hanya muncul di HP) */
+        .mobile-logo {
+            display: none;
+            color: #6441f1;
+            font-size: 1.8rem;
+            font-weight: bold;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1.5rem;
         }
         
-        /* Alert Messages */
+        .mobile-logo i {
+            font-size: 2rem;
+            margin-right: 10px;
+        }
+        
+        /* ========================================= */
+        /* ALERTS                                    */
+        /* ========================================= */
         .custom-alert { 
             background-color: #fef2f2; 
             border-left: 4px solid #ef4444; 
             color: #b91c1c; 
             padding: 12px 16px; 
-            border-radius: 6px; 
+            border-radius: 8px; 
             font-size: 0.85rem; 
             display: flex; 
             align-items: center; 
@@ -80,7 +103,7 @@
         
         .custom-alert i { 
             margin-right: 10px; 
-            font-size: 1rem; 
+            font-size: 1.1rem; 
         }
         
         .custom-alert.success { 
@@ -89,7 +112,9 @@
             color: #065f46; 
         }
         
-        /* Form Inputs */
+        /* ========================================= */
+        /* FORM INPUTS & BUTTONS                     */
+        /* ========================================= */
         .form-label { 
             font-size: 0.85rem; 
             font-weight: 700; 
@@ -104,53 +129,59 @@
         
         .input-wrapper i.icon-left { 
             position: absolute; 
-            left: 15px; 
+            left: 16px; 
             top: 50%; 
             transform: translateY(-50%); 
-            color: #9ca3af; 
+            color: #9ca3af;
+            font-size: 1.1rem;
         }
         
         .input-wrapper i.icon-right { 
             position: absolute; 
-            right: 15px; 
+            right: 16px; 
             top: 50%; 
             transform: translateY(-50%); 
             color: #9ca3af; 
-            cursor: pointer; 
+            cursor: pointer;
+            font-size: 1.1rem;
+            padding: 5px; /* Memperluas area sentuh */
         }
         
         .form-control-custom { 
             width: 100%; 
-            padding: 12px 40px; 
-            border-radius: 8px; 
-            border: 1px solid #d1d5db; 
-            font-size: 0.9rem; 
-            color: #4b5563; 
+            padding: 12px 45px; 
+            border-radius: 12px; 
+            border: 1px solid #e5e7eb; 
+            background-color: #f9fafb;
+            font-size: 0.95rem; 
+            color: #1f2937; 
             outline: none; 
-            transition: border-color 0.2s; 
+            transition: all 0.2s ease; 
         }
         
         .form-control-custom:focus { 
+            background-color: #ffffff;
             border-color: #7c5cff; 
-            box-shadow: 0 0 0 3px rgba(124, 92, 255, 0.1); 
+            box-shadow: 0 0 0 4px rgba(124, 92, 255, 0.1); 
         }
         
-        /* Typography & Buttons */
         .btn-ungu { 
             background: linear-gradient(135deg, #8160ff, #6441f1); 
             color: white; 
             border: none; 
-            border-radius: 8px; 
-            padding: 12px; 
-            font-weight: 600; 
+            border-radius: 12px; 
+            padding: 14px; 
+            font-weight: 700;
+            font-size: 1rem; 
             width: 100%; 
-            box-shadow: 0 4px 15px rgba(100, 65, 241, 0.3); 
+            box-shadow: 0 8px 20px rgba(100, 65, 241, 0.25); 
             margin-top: 1rem; 
-            transition: transform 0.2s; 
+            transition: all 0.3s ease; 
         }
         
         .btn-ungu:hover { 
-            transform: translateY(-2px); 
+            transform: translateY(-3px); 
+            box-shadow: 0 12px 25px rgba(100, 65, 241, 0.35);
             color: white; 
         }
         
@@ -159,9 +190,11 @@
             font-weight: 700; 
             text-decoration: none; 
             font-size: 0.85rem; 
+            transition: 0.2s;
         }
         
         .link-purple:hover { 
+            color: #4f33c7;
             text-decoration: underline; 
         }
         
@@ -174,13 +207,55 @@
             font-size: 0.7rem; 
             color: #9ca3af; 
         }
+
+        /* ========================================= */
+        /* MEDIA QUERIES (RESPONSIVITAS)             */
+        /* ========================================= */
+        @media (max-width: 992px) {
+            .form-section {
+                padding: 2rem;
+            }
+            .bg-purple-gradient {
+                padding: 3rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .form-section {
+                padding: 2rem 1.5rem;
+                align-items: center;
+            }
+            
+            .form-wrapper {
+                width: 100%;
+                max-width: 100%;
+            }
+
+            .mobile-logo {
+                display: flex;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .form-section {
+                padding: 1.5rem 1rem;
+            }
+            
+            .form-control-custom {
+                padding: 12px 40px;
+                font-size: 0.9rem;
+            }
+
+            .text-hint {
+                font-size: 0.65rem; /* Mengecilkan sedikit hint agar tidak bertabrakan dengan label di HP */
+            }
+        }
     </style>
 </head>
 <body>
 
     <div class="row login-card mx-0">
-        <!-- Left Sidebar: Branding -->
-        <div class="col-md-5 bg-purple-gradient d-none d-md-flex">
+        <div class="col-md-5 col-lg-6 bg-purple-gradient d-none d-md-flex">
             <div class="logo-title">
                 <i class="bi bi-layers-fill"></i> EIO Master
             </div>
@@ -189,16 +264,18 @@
             </p>
         </div>
 
-        <!-- Right Sidebar: Registration Form -->
-        <div class="col-md-7 form-section">
-            <div class="w-100" style="max-width: 400px; margin: 0 auto;">
+        <div class="col-md-7 col-lg-6 form-section">
+            <div class="form-wrapper" style="width: 100%; max-width: 400px; margin: 0 auto;">
+                
+                <div class="mobile-logo">
+                    <i class="bi bi-layers-fill"></i> EIO Master
+                </div>
                 
                 <div class="text-center mb-4">
                     <h3 class="fw-bold mb-1">Mulai Perjalananmu</h3>
                     <p class="text-small">Buat akun untuk membuka semua fitur AI EIO.</p>
                 </div>
 
-                <!-- Django Alert Messages -->
                 {% if messages %}
                     {% for message in messages %}
                         <div class="custom-alert {% if 'success' in message.tags %}success{% endif %}">
@@ -208,7 +285,6 @@
                     {% endfor %}
                 {% endif %}
 
-                <!-- Main Form -->
                 <form method="POST" action="{% url 'users:register' %}">
                     {% csrf_token %}
                     
@@ -231,7 +307,7 @@
                     <div class="input-wrapper">
                         <i class="bi bi-lock icon-left"></i>
                         <input type="password" id="regPassword" class="form-control-custom" name="password" placeholder="Masukkan password" required>
-                        <i class="bi bi-eye-slash icon-right" id="eyeReg" onclick="togglePass('regPassword', 'eyeReg')"></i>
+                        <i class="bi bi-eye-slash icon-right" id="eyeReg" onclick="togglePass('regPassword', 'eyeReg')" style="margin-right: -10px;"></i>
                     </div>
 
                     <div class="d-flex justify-content-between align-items-end mb-1">
@@ -241,15 +317,14 @@
                     <div class="input-wrapper">
                         <i class="bi bi-shield-lock icon-left"></i>
                         <input type="password" id="confPassword" class="form-control-custom" name="confirm_password" placeholder="Ulangi password" required>
-                        <i class="bi bi-eye-slash icon-right" id="eyeConf" onclick="togglePass('confPassword', 'eyeConf')"></i>
+                        <i class="bi bi-eye-slash icon-right" id="eyeConf" onclick="togglePass('confPassword', 'eyeConf')" style="margin-right: -10px;"></i>
                     </div>
 
                     <button type="submit" class="btn-ungu">Daftar</button>
                     
-                    <!-- Login Redirection -->
                     <div class="text-center mt-4">
                         <span class="text-small">Sudah punya akun?</span> 
-                        <a href="{% url 'users:login' %}" class="link-purple">Masuk</a>
+                        <a href="{% url 'users:login' %}" class="link-purple ms-1">Masuk</a>
                     </div>
                 </form>
                 
@@ -257,11 +332,10 @@
         </div>
     </div>
 
-    <!-- Password Visibility Toggle Script -->
     <script>
         function togglePass(inputId, iconId) {
-            var input = document.getElementById(inputId);
-            var icon = document.getElementById(iconId);
+            const input = document.getElementById(inputId);
+            const icon = document.getElementById(iconId);
             
             if (input.type === "password") {
                 input.type = "text";
